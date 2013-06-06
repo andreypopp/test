@@ -24,7 +24,8 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op);
+    this.doc.exec(op);
+
   },
 
   "Create text element", function() {
@@ -40,7 +41,7 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op);
+    this.doc.exec(op);
   },
 
   "Create some more text elements", function() {
@@ -69,8 +70,10 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op1);
-    this.doc.apply(op2);
+    this.doc.exec(op1);
+    this.doc.exec(op2);
+
+    
   },
 
   "Verify populated doc", function() {
@@ -86,7 +89,7 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op);
+    this.doc.exec(op);
     assert.isTrue(_.isEqual(this.doc.views["content"], ["text:1", "text:2", "heading:1", "text:3"]));
   },
 
@@ -103,9 +106,8 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op);
+    this.doc.exec(op);
   },
-
 
   "Create a new annotation", function() {
     var op = [
@@ -120,7 +122,7 @@ test.actions = [
       }
     ];
 
-    // Create a comment that sticks on the
+    // Create a comment that sticks on the annotation
     var op2 = [
       "insert",
       {
@@ -133,8 +135,8 @@ test.actions = [
       }
     ];
 
-    this.doc.apply(op);
-    this.doc.apply(op2);
+    this.doc.exec(op);
+    this.doc.exec(op2);
   },
 
   "Test indexes", function() {
@@ -165,11 +167,12 @@ test.actions = [
     ];
 
     // Delete element, then check indexes again
-    this.doc.apply(op);
+    this.doc.exec(op);
 
     // Get comments for annotation:1
     var comments = this.doc.find("comments", "annotation:1");
     assert.equal(comments.length, 0);
+
   },
 
   "Iteration", function() {
@@ -179,79 +182,80 @@ test.actions = [
     });
 
     assert.equal(count, 4);
+    console.log(this.doc);
   },
 
-  "Update Annotation", function() {
-    var op = [
-      "update",
-      {
-        "id": "annotation:1",
-        "type": "idea",
-        "data": {
-          "node": "text:2"
-        }
-      }
-    ];
+  // "Update Annotation", function() {
+  //   var op = [
+  //     "update",
+  //     {
+  //       "id": "annotation:1",
+  //       "type": "idea",
+  //       "data": {
+  //         "node": "text:2"
+  //       }
+  //     }
+  //   ];
 
-    this.doc.apply(op);
+  //   this.doc.apply(op);
 
-    // Annotation no longer sticks on text:1
-    var annotations = this.doc.find('annotations', 'text:1');
-    assert.equal(annotations.length, 0);
+  //   // Annotation no longer sticks on text:1
+  //   var annotations = this.doc.find('annotations', 'text:1');
+  //   assert.equal(annotations.length, 0);
 
-    // Should be returned when querying for annotations, text:2
-    annotations = this.doc.find('annotations', 'text:2');
-    assert.equal(annotations.length, 1);
-  },
+  //   // Should be returned when querying for annotations, text:2
+  //   annotations = this.doc.find('annotations', 'text:2');
+  //   assert.equal(annotations.length, 1);
+  // },
 
-  "OT Updates for multiple properties", function() {
-    var op = [
-      "insert",
-      {
-        "id": "comment:3",
-        "type": "comment",
-        "data": {
-          "node": "text:2",
-          "content": "Doe"
-        }
-      }
-    ];
+  // "OT Updates for multiple properties", function() {
+  //   var op = [
+  //     "insert",
+  //     {
+  //       "id": "comment:3",
+  //       "type": "comment",
+  //       "data": {
+  //         "node": "text:2",
+  //         "content": "Doe"
+  //       }
+  //     }
+  //   ];
 
-    var op2 = [
-      "update",
-      {
-        "id": "comment:3",
-        "data": {
-          "content": ["John ", 3]
-        }
-      }
-    ];
+  //   var op2 = [
+  //     "update",
+  //     {
+  //       "id": "comment:3",
+  //       "data": {
+  //         "content": ["John ", 3]
+  //       }
+  //     }
+  //   ];
 
-    this.doc.apply(op);
-    this.doc.apply(op2);
+  //   this.doc.apply(op);
+  //   this.doc.apply(op2);
 
-    var node = this.doc.nodes["comment:3"];
-    assert.equal(node.content, "John Doe");
+  //   var node = this.doc.nodes["comment:3"];
+  //   assert.equal(node.content, "John Doe");
 
-  },
+  // },
 
-  "Support objects as values", function() {
+  // "Support objects as values", function() {
 
-    var op = [
-      "update",
-      {
-        "id": "annotation:1",
-        "data": {
-          "pos": [1,27]
-        }
-      }
-    ];
+  //   var op = [
+  //     "update",
+  //     {
+  //       "id": "annotation:1",
+  //       "data": {
+  //         "pos": [1,27]
+  //       }
+  //     }
+  //   ];
 
-    this.doc.apply(op);
+  //   this.doc.apply(op);
 
-    var node = this.doc.nodes["annotation:1"];
-    assert.isTrue(_.isEqual(node.pos, [1, 27]));
-  },
+  //   var node = this.doc.nodes["annotation:1"];
+  //   assert.isTrue(_.isEqual(node.pos, [1, 27]));
+  // },
 ];
 
 root.Substance.registerTest(['Document', 'Document Manipulation'], test);
