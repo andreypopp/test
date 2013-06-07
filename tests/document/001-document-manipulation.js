@@ -1,8 +1,9 @@
 (function(root) {
 
-var assert = root.Substance.assert;
-var Document = root.Substance.Document;
 var _ = root._;
+var assert = root.Substance.assert;
+var util = root.Substance.util;
+var Document = root.Substance.Document;
 
 var test = {};
 
@@ -25,7 +26,7 @@ test.actions = [
     ];
 
     this.doc.exec(op);
-
+    assert.isArrayEqual(["heading:1"], this.doc.views['content']);
   },
 
   "Create text element", function() {
@@ -42,9 +43,10 @@ test.actions = [
     ];
 
     this.doc.exec(op);
+    assert.isArrayEqual(["heading:1", "text:1"], this.doc.views['content']);
   },
 
-  "Create some more text elements", function() {
+  "Insert using 'front' and 'back' keywords", function() {
 
     var op1 = [
       "insert",
@@ -71,13 +73,10 @@ test.actions = [
     ];
 
     this.doc.exec(op1);
+    assert.isArrayEqual(["text:2", "heading:1", "text:1"], this.doc.views['content']);
+
     this.doc.exec(op2);
-
-    
-  },
-
-  "Verify populated doc", function() {
-    assert.isTrue(_.isEqual(this.doc.views.content, ["text:2", "heading:1", "text:1", "text:3"]));
+    assert.isArrayEqual(["text:2", "heading:1", "text:1", "text:3"], this.doc.views['content']);
   },
 
   "Move operation", function() {
@@ -90,10 +89,10 @@ test.actions = [
     ];
 
     this.doc.exec(op);
-    assert.isTrue(_.isEqual(this.doc.views["content"], ["text:1", "text:2", "heading:1", "text:3"]));
+    assert.isArrayEqual(["text:1", "text:2", "heading:1", "text:3"], this.doc.views['content']);
   },
 
-  "Create a new comment", function() {
+  "Create a comment", function() {
     var op = [
       "insert",
       {
@@ -107,9 +106,14 @@ test.actions = [
     ];
 
     this.doc.exec(op);
+
+    // Get comments for text:1
+    var comments = this.doc.find("comments", "text:1");
+    assert.equal(comments.length, 1);
+    assert.equal(comments[0].id, "comment:1");
   },
 
-  "Create a new annotation", function() {
+  "Create an annotation", function() {
     var op = [
       "insert",
       {
@@ -122,8 +126,19 @@ test.actions = [
       }
     ];
 
+    this.doc.exec(op);
+
+    // Get annotations for text:1
+    var annotations = this.doc.find("annotations", "text:1");
+    assert.equal(annotations.length, 1);
+    assert.equal(annotations[0].id, "annotation:1");
+
+  },
+
+  "Test indexing", function() {
+
     // Create a comment that sticks on the annotation
-    var op2 = [
+    var op = [
       "insert",
       {
         "id": "comment:2",
@@ -136,20 +151,7 @@ test.actions = [
     ];
 
     this.doc.exec(op);
-    this.doc.exec(op2);
-  },
-
-  "Test indexes", function() {
-
-    // Get comments for text:1
-    var comments = this.doc.find("comments", "text:1");
-    assert.equal(comments.length, 1);
-    assert.equal(comments[0].id, "comment:1");
-
-    // Get annotations for text:1
-    var annotations = this.doc.find("annotations", "text:1");
-    assert.equal(annotations.length, 1);
-    assert.equal(annotations[0].id, "annotation:1");
+    console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
 
     // Get comments for annotation:1
     comments = this.doc.find("comments", "annotation:1");
