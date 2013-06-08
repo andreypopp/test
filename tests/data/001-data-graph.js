@@ -28,7 +28,7 @@ var test = {};
 // update content (String OT)
 // ["update", "h1.content", [-1, "ABC", 4]]
 // 
-// capitalize (joking)
+// reverse (joking)
 // ["reverse", "h1.content"]
 
 
@@ -198,7 +198,7 @@ var SCHEMA = {
 test.actions = [
   "Initialization", function() {
     // this.doc = new Document({"id": "substance-doc"});
-    this.graph = new Data.Graph();
+    this.graph = new Data.Graph(SCHEMA);
     console.log('initializing...');
   },
 
@@ -208,7 +208,7 @@ test.actions = [
       "id": "document",
       "type": "document",
       "data": {
-        "views": ["view:content", "view:figures"]
+        "views": ["content", "figures"]
       }
     };
 
@@ -220,7 +220,7 @@ test.actions = [
   "Create content view", function() {
     var op = {
       "op": "create",
-      "id": "content_view",
+      "id": "content",
       "type": "view",
       "data": {
         "nodes": []
@@ -235,7 +235,7 @@ test.actions = [
   "Create a new text node", function() {
     var op = {
       "op": "create",
-      "id": "heading:1",
+      "id": "h1",
       "type": "heading",
       "data": {
         "content": "Heading 1"
@@ -246,12 +246,9 @@ test.actions = [
     // assert.isArrayEqual(["heading:1"], this.doc.views['content']);
   }, 
 
-  // Addressing
-  "Add text node to content_view", function() {
+  "Add text node to content view", function() {
     var op = [
-      "push", "content_view.nodes", { // content_view.nodes is an array
-        "value": "h1"
-      }
+      "push", "content.nodes", {"value": "h1"}
     ];
 
     // this.doc.exec(op);
