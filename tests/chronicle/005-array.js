@@ -125,11 +125,21 @@ var ArrayOperationTest = function() {
       testTransform(b, a, input, expected);
     },
 
-    "Transformation: a=Move, b=Delete, a left of b", function() {
+    "Transformation: a=Move, b=Delete, a before b", function() {
       var input = [1,2,3];
       var expected = [2,1];
       var a = new ArrayOperation([">>", 0, 1]);
       var b = new ArrayOperation(["-", 2, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Delete, a after b", function() {
+      var input = [1,2,3];
+      var expected = [3,2];
+      var a = new ArrayOperation([">>", 1, 2]);
+      var b = new ArrayOperation(["-", 0, 1]);
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -185,11 +195,21 @@ var ArrayOperationTest = function() {
       testTransform(b, a, input, expected);
     },
 
-    "Transformation: a=Move, b=Insert, a < b", function() {
+    "Transformation: a=Move, b=Insert, a before b", function() {
       var input = [1,2,4];
       var expected = [2,1,3,4];
       var a = new ArrayOperation([">>", 0, 1]);
       var b = new ArrayOperation(["+", 2, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Insert, a after b", function() {
+      var input = [2,3,4];
+      var expected = [1,2,4,3];
+      var a = new ArrayOperation([">>", 1, 2]);
+      var b = new ArrayOperation(["+", 0, 1]);
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -255,7 +275,7 @@ var ArrayOperationTest = function() {
       testTransform(b, a, input, expected);
     },
 
-    "Brutal merge", function() {
+    "Manual merge", function() {
       this.chronicle.open(this.ID4);
       this.ID_M1 = this.chronicle.merge(this.ID6, "manual", {sequence: [this.ID2, this.ID6, this.ID4]});
 
