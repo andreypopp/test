@@ -9,35 +9,40 @@ var test = {};
 
 // Graph operations
 // ================
-// 
+//
 // Message format
 // [:opcode, :target, :data] where opcodes can be overloaded for different types, the type is determined by the target (can either be a node or node.property),
-//                           data is an optional hash 
-// 
+//                           data is an optional hash
+//
 // Node operations
 // --------
 // create heading node
-// ["create", "h1", {"type": heading, "content": "Hello World"}]
-// 
+// ["create", {id: "h1", type: "heading", "content": "Hello World" } ]
+//
+// {
+//    op: "create"
+//    path: []
+//    args:
+// }
 // delete node
 // ["delete", "h1"]
 
 // String operations
 // ---------
-// 
+//
 // update content (String OT)
-// ["update", "h1.content", [-1, "ABC", 4]]
-// 
+// ["update", "h1", "content", [-1, "ABC", 4]]
+//
 // reverse (joking)
-// ["reverse", "h1.content"]
+// ["reverse", "h1", "content"]
 
 
 // Number operations
 // ---------
-// 
+//
 // update content (String OT)
 // ["increment", "h1.level"]
-// 
+//
 
 
 // Array operations
@@ -45,13 +50,12 @@ var test = {};
 
 // Push new value to end of array
 // ["push", "content_view.nodes", {value: "new-entry"}]
-// 
+//
 // Delete 1..n elements
 // ["delete", "content_view.nodes", {values: ["v1", "v2"]}]
 
 // Insert element at position index
 // ["insert", "content_view.nodes", {value: "newvalue", index: 3}]
-
 
 
 var SCHEMA = {
@@ -198,65 +202,71 @@ var SCHEMA = {
 test.actions = [
   "Initialization", function() {
     // this.doc = new Document({"id": "substance-doc"});
-    this.graph = new Data.Graph(SCHEMA);
+    this.graph = new Substance.Data.Graph(SCHEMA);
     console.log('initializing...');
   },
 
   "Create a new document node", function() {
-    var op = {
-      "op": "create",
-      "id": "document",
-      "type": "document",
-      "data": {
+    var op = ["create", {
+        "id": "document",
+        "type": "document",
         "views": ["content", "figures"]
       }
-    };
+    ];
 
-    // this.doc.exec(op);
     this.graph.exec(op);
-    // assert.isArrayEqual(["heading:1"], this.doc.views['content']);
+    assert.isDefined(this.graph.nodes['document']);
   },
 
   "Create content view", function() {
-    var op = {
-      "op": "create",
-      "id": "content",
-      "type": "view",
-      "data": {
+
+    var op = ["create", {
+        "id": "content",
+        "type": "view",
         "nodes": []
       }
-    };
-    
-    // this.doc.exec(op);
-    this.graph.exec(op);
-    // assert.isArrayEqual(["heading:1"], this.doc.views['content']);
-  },
-
-  "Create a new text node", function() {
-    var op = {
-      "op": "create",
-      "id": "h1",
-      "type": "heading",
-      "data": {
-        "content": "Heading 1"
-      }
-    };
-    // this.doc.exec(op);
-    this.graph.exec(op);
-    // assert.isArrayEqual(["heading:1"], this.doc.views['content']);
-  }, 
-
-  "Add text node to content view", function() {
-    var op = [
-      "push", "content.nodes", {"value": "h1"}
     ];
 
-    // this.doc.exec(op);
     this.graph.exec(op);
-    // assert.isArrayEqual(["heading:1"], this.doc.views['content']);
+    assert.isDefined(this.graph.nodes['content']);
   },
 
+  "Create a new heading node", function() {
+    var op = ["create", {
+        "id": "h1",
+        "type": "heading",
+        "content": "Heading 1"
+      }
+    ];
 
+    this.graph.exec(op);
+    assert.isDefined(this.graph.nodes['h1']);
+  },
+
+  "Add heading node to content view", function() {
+    var op = [
+      "push", "content", "nodes", {"value": "h1"}
+    ];
+
+    this.graph.exec(op);
+    assert.isArrayEqual(["h1"], this.graph.nodes['content'].nodes);
+  },
+
+  "Update heading content", function() {
+    var op = [
+      "update", "h1", "content", ["+", 3, "bla"]
+    ];
+    this.graph.exec(op);
+    assert.isEqual("Heablading 1", this.graph.get("h1").content);
+  },
+
+  "Add heading to 'content' view", function() {
+    var op = [
+      "update", "content", "nodes", ["+", 0, "h1"]
+    ];
+    this.graph.exec(op);
+    assert.isArrayEqual(["h1"], this.graph.get("content").nodes);
+  },
 
 ];
 
