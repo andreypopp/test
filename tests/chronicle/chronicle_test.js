@@ -9,7 +9,7 @@ var __OP__ = 1;
 var __VAL__ = 2;
 var __RESULT__ = 3;
 
-var ROOT = Chronicle.Index.ROOT.id;
+var ROOT = Chronicle.ROOT;
 
 // Index structure:
 //
@@ -64,7 +64,7 @@ var ChronicleTest = function() {
     this.index = Chronicle.Index.create();
     this.chronicle = Chronicle.create(this.index);
     this.comp = new testchronicle.VersionedComputador(this.chronicle);
-    Chronicle.uuid = this.uuid;
+    this.chronicle.uuid = this.uuid;
 
     this.fixture();
   };

@@ -7,7 +7,7 @@ var _ = root._;
 
 var Chronicle = Substance.Chronicle;
 var ChronicleTest = Substance.test.ChronicleTest;
-var ROOT = Chronicle.Index.ROOT.id;
+var ROOT = Chronicle.ROOT;
 
 // Index structure:
 //
