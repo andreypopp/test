@@ -2,7 +2,7 @@
 
 var _ = root._;
 var assert = root.Substance.assert;
-var util = root.Substance.util;
+var Substance = root.Substance;
 
 var test = {};
 
@@ -19,11 +19,9 @@ var test = {};
 // create heading node
 // ["create", {id: "h1", type: "heading", "content": "Hello World" } ]
 //
-// {
-//    op: "create"
-//    path: []
-//    args:
-// }
+// internal representation:
+// { op: "create", path: [], args: {id: "h1", type: "heading", "content": "Hello World" } }
+//
 // delete node
 // ["delete", "h1"]
 
@@ -203,7 +201,6 @@ test.actions = [
   "Initialization", function() {
     // this.doc = new Document({"id": "substance-doc"});
     this.graph = new Substance.Data.Graph(SCHEMA);
-    console.log('initializing...');
   },
 
   "Create a new document node", function() {
@@ -215,7 +212,7 @@ test.actions = [
     ];
 
     this.graph.exec(op);
-    assert.isDefined(this.graph.nodes['document']);
+    assert.isArrayEqual(["content", "figures"], this.graph.get('document').views);
   },
 
   "Create content view", function() {
@@ -228,7 +225,7 @@ test.actions = [
     ];
 
     this.graph.exec(op);
-    assert.isDefined(this.graph.nodes['content']);
+    assert.isTrue(_.isArray(this.graph.get('content').nodes));
   },
 
   "Create a new heading node", function() {
@@ -240,16 +237,15 @@ test.actions = [
     ];
 
     this.graph.exec(op);
-    assert.isDefined(this.graph.nodes['h1']);
+    assert.isEqual(op[1].content, this.graph.get('h1').content);
   },
 
   "Add heading node to content view", function() {
     var op = [
       "push", "content", "nodes", {"value": "h1"}
     ];
-
     this.graph.exec(op);
-    assert.isArrayEqual(["h1"], this.graph.nodes['content'].nodes);
+    assert.isArrayEqual(["h1"], this.graph.get('content').nodes);
   },
 
   "Update heading content", function() {
@@ -260,12 +256,32 @@ test.actions = [
     assert.isEqual("Heablading 1", this.graph.get("h1").content);
   },
 
-  "Add heading to 'content' view", function() {
+  "Create a text node", function() {
+    var op = ["create", {
+        "id": "text1",
+        "type": "text",
+        "content": "This is text1."
+      }
+    ];
+
+    this.graph.exec(op);
+    assert.isEqual(op[1].content, this.graph.get('text1').content);
+  },
+
+  "Add 'text1' to 'content' view", function() {
     var op = [
-      "update", "content", "nodes", ["+", 0, "h1"]
+      "update", "content", "nodes", ["+", 1, "text1"]
     ];
     this.graph.exec(op);
-    assert.isArrayEqual(["h1"], this.graph.get("content").nodes);
+    assert.isArrayEqual(["h1", "text1"], this.graph.get("content").nodes);
+  },
+
+  "Move 'text1'", function() {
+    var op = [
+      "update", "content", "nodes", [">>", 1, 0]
+    ];
+    this.graph.exec(op);
+    assert.isArrayEqual(["text1", "h1"], this.graph.get("content").nodes);
   },
 
 ];
