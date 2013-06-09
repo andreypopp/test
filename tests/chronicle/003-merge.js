@@ -12,6 +12,15 @@ var ROOT = Chronicle.Index.ROOT.id;
 //    |                - 05 - 06
 //      - 07 - 08
 
+// 01: + 5
+// 02: - 3
+// 03: * 3
+// 04: / 2
+// 05: + 1
+// 06: + 2
+// 07: - 1
+// 08: - 2
+
 var Merge = function() {
 
   ChronicleTest.call(this);
@@ -87,6 +96,13 @@ var Merge = function() {
       assert.isEqual(this.M3, this.comp.getState());
 
       assert.isEqual(expected, this.comp.result);
+    },
+
+    "Manual Merge - theirs after mine", function() {
+      this.chronicle.open("02");
+      this.M4 = this.chronicle.merge("08", "manual", {sequence: ["01", "02", "07", "08"]});
+      assert.isTrue(this.index.contains(this.M4));
+      assert.isEqual(-1, this.comp.result);
     },
 
     "Traversal across manual merge", function() {
