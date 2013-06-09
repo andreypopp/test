@@ -1,61 +1,11 @@
 (function(root) {
 
 var _ = root._;
-var assert = root.Substance.assert;
 var Substance = root.Substance;
+var util = Substance.util;
+var assert = Substance.assert;
 
 var test = {};
-
-
-// Graph operations
-// ================
-//
-// Message format
-// [:opcode, :target, :data] where opcodes can be overloaded for different types, the type is determined by the target (can either be a node or node.property),
-//                           data is an optional hash
-//
-// Node operations
-// --------
-// create heading node
-// ["create", {id: "h1", type: "heading", "content": "Hello World" } ]
-//
-// internal representation:
-// { op: "create", path: [], args: {id: "h1", type: "heading", "content": "Hello World" } }
-//
-// delete node
-// ["delete", "h1"]
-
-// String operations
-// ---------
-//
-// update content (String OT)
-// ["update", "h1", "content", [-1, "ABC", 4]]
-//
-// reverse (joking)
-// ["reverse", "h1", "content"]
-
-
-// Number operations
-// ---------
-//
-// update content (String OT)
-// ["increment", "h1.level"]
-//
-
-
-// Array operations
-// ---------------
-
-// Push new value to end of array
-// ["push", "content_view.nodes", {value: "new-entry"}]
-//
-// Delete 1..n elements
-// ["delete", "content_view.nodes", {values: ["v1", "v2"]}]
-
-// Insert element at position index
-// ["insert", "content_view.nodes", {value: "newvalue", index: 3}]
-
-
 var SCHEMA = {
   "views": {
     // Stores order for content nodes
@@ -196,91 +146,116 @@ var SCHEMA = {
   }
 };
 
+var OP1 = ["create", { "id": "document", "type": "document", "views": ["content", "figures"]} ];
+var OP2 = ["create", { "id": "content", "type": "view", "nodes": []} ];
+var OP3 = ["create", { "id": "h1", "type": "heading", "content": "Heading 1" } ];
+var OP4 = ["push", "content", "nodes", {"value": "h1"} ];
+var OP5 = ["create", { "id": "text1", "type": "text", "content": "This is text1." } ];
+var OP6 = ["push", "content", "nodes", {"value": "text1"} ];
+var OP7 = [ "update", "content", "nodes", [">>", 1, 0] ];
+var OP8 = ["create", { "id": "text2", "type": "text", "content": "This is text2." } ];
+var OP9 = ["push", "content", "nodes", {"value": "text2"} ];
+
+
 test.setup = function() {
   this.graph = new Substance.Data.VersionedGraph(SCHEMA);
+  this.chronicle = this.graph.chronicle;
+  this.index = this.chronicle.index;
+  this.adapter = this.graph.chronicle.versioned;
+
+  this.ID = ["ROOT"];
+  this.M = [];
+
+  var self = this;
+  this.CHECKS = {"ROOT": function() {
+    assert.isTrue(_.isEmpty(self.graph.nodes));
+  }};
+  this.chronicle.uuid = util.custom_uuid({id: 1});
+
 };
 
 test.actions = [
 
-  "Create a new document node", function() {
-    var op = ["create", {
-        "id": "document",
-        "type": "document",
-        "views": ["content", "figures"]
-      }
-    ];
+  "Creation", function() {
+    var check;
+    var self = this;
 
-    this.graph.exec(op);
-    assert.isArrayEqual(["content", "figures"], this.graph.get('document').views);
+    this.CHECKS["ROOT"]();
+
+    this.graph.exec(OP1);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isArrayEqual(["content", "figures"], self.graph.get("document").views);
+    };
+    check();
+
+    this.graph.exec(OP2);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isArrayEqual([], self.graph.get("content").nodes);
+    };
+    check();
+
+    this.graph.exec(OP3);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isEqual("Heading 1", self.graph.get("h1").content);
+    };
+    check();
+
+    this.graph.exec(OP4);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isArrayEqual(["h1"], self.graph.get("content").nodes);
+    };
+    check();
+
+    this.graph.exec(OP5);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isEqual("This is text1.", self.graph.get("text1").content);
+    };
+    check();
+
+    this.graph.exec(OP6);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isArrayEqual(["h1", "text1"], self.graph.get("content").nodes);
+    };
+    check();
+
+    this.graph.exec(OP7);
+    this.ID.push(this.chronicle.getState());
+    this.CHECKS[_.last(this.ID)] = check = function() {
+      assert.isArrayEqual(["text1", "h1"], self.graph.get("content").nodes);
+    };
+    check();
   },
 
-  "Create content view", function() {
+  "Random checkout", function() {
+    this.graph.reset();
 
-    var op = ["create", {
-        "id": "content",
-        "type": "view",
-        "nodes": []
-      }
-    ];
+    var sequence = ["1", "7", "5", "4", "3", "2", "6"];
 
-    this.graph.exec(op);
-    assert.isTrue(_.isArray(this.graph.get('content').nodes));
+    _.each(sequence, function(id) {
+      console.log("Checking out version: ", id);
+      this.chronicle.open(id);
+      this.CHECKS[id].call(this);
+    }, this);
   },
 
-  "Create a new heading node", function() {
-    var op = ["create", {
-        "id": "h1",
-        "type": "heading",
-        "content": "Heading 1"
-      }
-    ];
+  "Merge", function() {
+    this.chronicle.open(this.ID[4]);
+    this.graph.exec(OP8);
+    this.ID.push(this.chronicle.getState());
+    this.graph.exec(OP9);
+    this.ID.push(this.chronicle.getState());
 
-    this.graph.exec(op);
-    assert.isEqual(op[1].content, this.graph.get('h1').content);
-  },
+    this.chronicle.open(this.ID[7]);
+    this.chronicle.merge(this.ID[9], "manual", {sequence: [this.ID[5], this.ID[6], this.ID[8], this.ID[9], this.ID[7]] });
+    this.M.push(this.chronicle.getState());
 
-  "Add heading node to content view", function() {
-    var op = [
-      "push", "content", "nodes", {"value": "h1"}
-    ];
-    this.graph.exec(op);
-    assert.isArrayEqual(["h1"], this.graph.get('content').nodes);
-  },
-
-  "Update heading content", function() {
-    var op = [
-      "update", "h1", "content", ["+", 3, "bla"]
-    ];
-    this.graph.exec(op);
-    assert.isEqual("Heablading 1", this.graph.get("h1").content);
-  },
-
-  "Create a text node", function() {
-    var op = ["create", {
-        "id": "text1",
-        "type": "text",
-        "content": "This is text1."
-      }
-    ];
-
-    this.graph.exec(op);
-    assert.isEqual(op[1].content, this.graph.get('text1').content);
-  },
-
-  "Add 'text1' to 'content' view", function() {
-    var op = [
-      "update", "content", "nodes", ["+", 1, "text1"]
-    ];
-    this.graph.exec(op);
-    assert.isArrayEqual(["h1", "text1"], this.graph.get("content").nodes);
-  },
-
-  "Move 'text1'", function() {
-    var op = [
-      "update", "content", "nodes", [">>", 1, 0]
-    ];
-    this.graph.exec(op);
-    assert.isArrayEqual(["text1", "h1"], this.graph.get("content").nodes);
+    assert.isArrayEqual(["text1", "h1", "text2"], this.graph.get("content").nodes);
   },
 
 ];
