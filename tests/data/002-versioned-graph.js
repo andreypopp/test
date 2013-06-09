@@ -197,7 +197,7 @@ var SCHEMA = {
 };
 
 test.setup = function() {
-  this.graph = new Substance.Data.Graph(SCHEMA);
+  this.graph = new Substance.Data.VersionedGraph(SCHEMA);
 };
 
 test.actions = [
@@ -285,6 +285,6 @@ test.actions = [
 
 ];
 
-root.Substance.registerTest(['Data', 'Data Graph Manipulation'], test);
+root.Substance.registerTest(['Data', 'Versioned Graph'], test);
 
 })(this);
