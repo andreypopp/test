@@ -8,13 +8,17 @@ var Data = root.Substance.Data;
 
 var test = {};
 
+test.setup = function() {
+  this.doc = new Document({"id": "substance-doc"});
+};
+
 test.actions = [
   "Initialization", function() {
-    this.doc = new Document({"id": "substance-doc"});
+    
   },
 
   "Check if valid document has been constructed", function() {    
-    assert.isArrayEqual(["content", "figures"], this.doc.get('document').views);
+    assert.isArrayEqual(["content", "figures", "publications"], this.doc.get('document').views);
     assert.isTrue(_.isArray(this.doc.get('content').nodes));
   },
 

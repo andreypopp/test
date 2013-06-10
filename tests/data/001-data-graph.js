@@ -23,7 +23,7 @@ var test = {};
 // { op: "create", path: [], args: {id: "h1", type: "heading", "content": "Hello World" } }
 //
 // delete node
-// ["delete", "h1"]
+// ["delete", {"id": "t1"}]
 
 // String operations
 // ---------
