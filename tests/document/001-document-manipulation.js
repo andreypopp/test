@@ -4,6 +4,7 @@ var _ = root._;
 var assert = root.Substance.assert;
 var util = root.Substance.util;
 var Document = root.Substance.Document;
+var Data = root.Substance.Data;
 
 var test = {};
 
@@ -12,151 +13,139 @@ test.actions = [
     this.doc = new Document({"id": "substance-doc"});
   },
 
-  "Create heading", function() {
-    var op = [
-      "insert",
-      {
-        "id": "heading:1",
+  "Check if valid document has been constructed", function() {    
+    assert.isArrayEqual(["content", "figures"], this.doc.get('document').views);
+    assert.isTrue(_.isArray(this.doc.get('content').nodes));
+  },
+
+  "Create a new heading node", function() {
+    var op = ["create", {
+        "id": "h1",
         "type": "heading",
-        "target": "back",
-        "data": {
-          "content": "Heading 1"
-        }
+        "content": "Heading 1"
       }
     ];
 
     this.doc.exec(op);
-    assert.isArrayEqual(["heading:1"], this.doc.views['content']);
+    assert.isEqual(op[1].content, this.doc.get('h1').content);
   },
 
-  "Create text element", function() {
-    var op = [
-      "insert",
-      {
-        "id": "text:1",
+  "Create a new text nodes", function() {
+    var op = ["create", {
+        "id": "t1",
         "type": "text",
-        "target": "heading:1",
-        "data": {
-          "content": "Text 1"
-        }
+        "content": "Text 1"
+      }
+    ];
+
+    var op2 = ["create", {
+        "id": "t2",
+        "type": "text",
+        "content": "Text 2"
       }
     ];
 
     this.doc.exec(op);
-    assert.isArrayEqual(["heading:1", "text:1"], this.doc.views['content']);
-  },
-
-  "Insert using 'front' and 'back' keywords", function() {
-
-    var op1 = [
-      "insert",
-      {
-        "id": "text:2",
-        "type": "text",
-        "target": "front",
-        "data": {
-          "content": "Text 2"
-        }
-      }
-    ];
-
-    var op2 = [
-      "insert",
-      {
-        "id": "text:3",
-        "type": "text",
-        "target": "back",
-        "data": {
-          "content": "Text 3"
-        }
-      }
-    ];
-
-    this.doc.exec(op1);
-    assert.isArrayEqual(["text:2", "heading:1", "text:1"], this.doc.views['content']);
-
     this.doc.exec(op2);
-    assert.isArrayEqual(["text:2", "heading:1", "text:1", "text:3"], this.doc.views['content']);
+
+    assert.isDefined(this.doc.get('t1'));
+    assert.isDefined(this.doc.get('t2'));
   },
 
-  "Move operation", function() {
+  "Add heading node to content view", function() {
     var op = [
-      "move",
-      {
-        "nodes": ["text:2", "heading:1"],
-        "target": "text:1"
-      }
+      "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
     ];
-
     this.doc.exec(op);
-    assert.isArrayEqual(["text:1", "text:2", "heading:1", "text:3"], this.doc.views['content']);
+    assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
   },
+
+  "Add heading node to content view", function() {
+    var op = [
+      "position", "content", {"nodes": ["h1", "t1", "t2"], "target": 0}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
+    console.log('LES DOC', this.doc);
+  },
+
+  // "Update heading content", function() {
+  //   var op = [
+  //     "update", "h1", "content", ["+", 3, "bla"]
+  //   ];
+
+  //   // [3, "abcd", -4, ]
+  //   // var op = ["update", "h1", {
+  //   //   "content": ["+", 3, ""],
+  //   //   "foo": "doink"
+  //   // }];
+
+  //   // var op = ["set", "h1", {
+  //   //   "foo": "doink"
+  //   // }]
+
+  //   // var op = ["set", "h1", {
+  //   //   "foo": "asdfsdf",
+  //   //   "children": ["t1", "v1"]
+  //   // }]
+
+  //   this.graph.exec(op);
+  //   assert.isEqual("Heablading 1", this.graph.get("h1").content);
+  // },
 
   "Create a comment", function() {
-    var op = [
-      "insert",
-      {
-        "id": "comment:1",
+
+    var op = ["create", {
+        "id": "c1",
         "type": "comment",
-        "data": {
-          "node": "text:1",
-          "content": "Comment 1"
-        }
+        "content": "Hi, I'm a comment",
+        "node": "t1"
       }
     ];
 
     this.doc.exec(op);
 
-    // Get comments for text:1
-    var comments = this.doc.find("comments", "text:1");
+    // Get comments for t1
+    var comments = this.doc.find("comments", "t1");
     assert.equal(comments.length, 1);
-    assert.equal(comments[0].id, "comment:1");
+    assert.equal(comments[0].id, "c1");
   },
 
   "Create an annotation", function() {
-    var op = [
-      "insert",
-      {
-        "id": "annotation:1",
-        "type": "idea",
-        "data": {
-          "node": "text:1",
-          "pos": [1, 4]
-        }
+
+    var op = ["create", {
+        "id": "a1",
+        "type": "annotation",
+        "pos": [1, 4],
+        "node": "t1"
       }
     ];
 
     this.doc.exec(op);
 
     // Get annotations for text:1
-    var annotations = this.doc.find("annotations", "text:1");
+    var annotations = this.doc.find("annotations", "t1");
     assert.equal(annotations.length, 1);
-    assert.equal(annotations[0].id, "annotation:1");
-
+    assert.equal(annotations[0].id, "a1");
   },
 
-  "Test indexing", function() {
-
+  "Stick comment to annotation", function() {
     // Create a comment that sticks on the annotation
-    var op = [
-      "insert",
-      {
-        "id": "comment:2",
-        "type": "comment",
-        "data": {
-          "node": "annotation:1",
-          "content": "Hello world"
-        }
+    var op = ["create", {
+        "id": "c2",
+        "type": "comment", // TODO: consider moving that into data object
+        "node": "a1",
+        "content": "Hello world"
       }
     ];
 
     this.doc.exec(op);
-    console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
+    // console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
 
     // Get comments for annotation:1
-    comments = this.doc.find("comments", "annotation:1");
+    comments = this.doc.find("comments", "a1");
     assert.equal(comments.length, 1);
-    assert.equal(comments[0].id, "comment:2");
+    assert.equal(comments[0].id, "c2");
 
   },
 
@@ -164,7 +153,7 @@ test.actions = [
     var op = [
       "delete",
       {
-        "nodes": ["comment:1", "comment:2"]
+        "nodes": ["c1", "c2"]
       }
     ];
 
@@ -172,34 +161,33 @@ test.actions = [
     this.doc.exec(op);
 
     // Get comments for annotation:1
-    var comments = this.doc.find("comments", "annotation:1");
+    var comments = this.doc.find("comments", "a1");
     assert.equal(comments.length, 0);
 
   },
 
-  "Iteration", function() {
-    var count = 0;
-    this.doc.each(function() {
-      count++;
-    });
+  // "Iteration", function() {
+  //   var count = 0;
+  //   this.doc.each(function() {
+  //     count++;
+  //   }); 
 
-    assert.equal(count, 4);
-    console.log(this.doc);
-  },
+  //   assert.equal(count, 4);
+  //   console.log(this.doc);
+  // },
 
   // "Update Annotation", function() {
   //   var op = [
   //     "update",
   //     {
   //       "id": "annotation:1",
-  //       "type": "idea",
   //       "data": {
   //         "node": "text:2"
   //       }
   //     }
   //   ];
 
-  //   this.doc.apply(op);
+  //   this.doc.exec(op);
 
   //   // Annotation no longer sticks on text:1
   //   var annotations = this.doc.find('annotations', 'text:1');
@@ -208,6 +196,36 @@ test.actions = [
   //   // Should be returned when querying for annotations, text:2
   //   annotations = this.doc.find('annotations', 'text:2');
   //   assert.equal(annotations.length, 1);
+  // },
+
+  // "Update Text by assigning new value", function() {
+  //   var op = [
+  //     "update",
+  //     {
+  //       "id": "text:1",
+  //       "data": {
+  //         "content": "Text Eins"
+  //       }
+  //     }
+  //   ];
+
+  //   this.doc.exec(op);
+  //   assert.isEqual("Text Eins", this.doc.nodes["text:1"].content);
+  // },
+
+  // "Update numeric value of a heading", function() {
+  //   var op = [
+  //     "update",
+  //     {
+  //       "id": "heading:1",
+  //       "data": {
+  //         "level": 2
+  //       }
+  //     }
+  //   ];
+
+  //   this.doc.exec(op);
+  //   assert.isEqual(2, this.doc.nodes["heading:1"].level);
   // },
 
   // "OT Updates for multiple properties", function() {
