@@ -73,29 +73,32 @@ test.actions = [
     console.log('LES DOC', this.doc);
   },
 
-  // "Update heading content", function() {
-  //   var op = [
-  //     "update", "h1", "content", ["+", 3, "bla"]
-  //   ];
+  "Update heading content", function() {
+    var op = [
+      "update", "h1", {
+        "content": [4, "ING", -3]
+      }
+    ];
 
-  //   // [3, "abcd", -4, ]
-  //   // var op = ["update", "h1", {
-  //   //   "content": ["+", 3, ""],
-  //   //   "foo": "doink"
-  //   // }];
+    // [3, "abcd", -4, ]
+    // var op = ["update", "h1", {
+    //   "content": ["+", 3, ""],
+    //   "foo": "doink"
+    // }];
 
-  //   // var op = ["set", "h1", {
-  //   //   "foo": "doink"
-  //   // }]
+    // var op = ["set", "h1", {
+    //   "foo": "doink"
+    // }]
 
-  //   // var op = ["set", "h1", {
-  //   //   "foo": "asdfsdf",
-  //   //   "children": ["t1", "v1"]
-  //   // }]
+    // var op = ["set", "h1", {
+    //   "foo": "asdfsdf",
+    //   "children": ["t1", "v1"]
+    // }]
 
-  //   this.graph.exec(op);
-  //   assert.isEqual("Heablading 1", this.graph.get("h1").content);
-  // },
+    this.doc.exec(op);
+
+    assert.isEqual("HeadING 1", this.doc.get("h1").content);
+  },
 
   "Create a comment", function() {
 
@@ -153,7 +156,7 @@ test.actions = [
 
   },
 
-  "Delete some comments", function() {
+  "Delete all comments", function() {
     var op = [
       "delete",
       {
@@ -167,7 +170,9 @@ test.actions = [
     // Get comments for annotation:1
     var comments = this.doc.find("comments", "a1");
     assert.equal(comments.length, 0);
-
+    assert.equal(undefined, this.doc.get('c1'));
+    assert.equal(undefined, this.doc.get('c2'));
+    assert.isDefined(this.doc.get('a1'));
   },
 
   // "Iteration", function() {
