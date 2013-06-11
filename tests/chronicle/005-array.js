@@ -275,6 +275,251 @@ var ArrayOperationTest = function() {
       testTransform(b, a, input, expected);
     },
 
+    // There are 24 canonical cases with strict ordering
+    // and 16 cases with partially equal indices (total 40)
+
+    // a.s < a.t < b.s < b.t
+    // a.s < a.t < b.t < b.s
+    // a.t < a.s < b.s < b.t
+    // a.t < a.s < b.t < b.s
+    "Transformation: a=Move, b=Move (1-4), a before b", function() {
+      var input = [1,2,3,4];
+      var expected = [2,1,4,3];
+      var a = new ArrayOperation([">>", 0, 1]);
+      var b = new ArrayOperation([">>", 2, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    // b.s < b.t < a.s < a.t
+    // b.s < b.t < a.t < a.s
+    // b.t < b.s < a.s < a.t
+    // b.t < b.s < a.t < a.s
+    "Transformation: a=Move, b=Move (5-8), a after b", function() {
+      var input = [1,2,3,4];
+      var expected = [2,1,4,3];
+      var a = new ArrayOperation([">>", 2, 3]);
+      var b = new ArrayOperation([">>", 0, 1]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    // 16 remaining cases (strict ordering)
+    "Transformation: a=Move, b=Move (9), a.s < b.s < a.t < b.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 0, 2]);
+      var b = new ArrayOperation([">>", 1, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (10), a.s < b.s < b.t < a.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,2,4,1];
+      var a = new ArrayOperation([">>", 0, 3]);
+      var b = new ArrayOperation([">>", 1, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (11), a.s < b.t < a.t < b.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,2,3,1];
+      var a = new ArrayOperation([">>", 0, 2]);
+      var b = new ArrayOperation([">>", 3, 1]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (12), a.s < b.t < b.s < a.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,2,4,1];
+      var a = new ArrayOperation([">>", 0, 3]);
+      var b = new ArrayOperation([">>", 2, 1]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (13), a.t < b.s < a.s < b.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 2, 0]);
+      var b = new ArrayOperation([">>", 1, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (14), a.t < b.s < b.t < a.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,1,3,2];
+      var a = new ArrayOperation([">>", 3, 0]);
+      var b = new ArrayOperation([">>", 1, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (15), a.t < b.t < a.s < b.s", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 2, 0]);
+      var b = new ArrayOperation([">>", 3, 1]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (16), a.t < b.t < b.s < a.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,1,3,2];
+      var a = new ArrayOperation([">>", 3, 0]);
+      var b = new ArrayOperation([">>", 2, 1]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (17), b.s < a.s < a.t < b.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,2,4,1];
+      var a = new ArrayOperation([">>", 1, 2]);
+      var b = new ArrayOperation([">>", 0, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (18), b.s < a.s < b.t < a.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 1, 3]);
+      var b = new ArrayOperation([">>", 0, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (19), b.s < a.t < a.s < b.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,2,4,1];
+      var a = new ArrayOperation([">>", 2, 1]);
+      var b = new ArrayOperation([">>", 0, 3]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (20), b.s < a.t < b.t < a.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,2,3,1];
+      var a = new ArrayOperation([">>", 3, 1]);
+      var b = new ArrayOperation([">>", 0, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (21), b.t < a.s < a.t < b.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,1,3,2];
+      var a = new ArrayOperation([">>", 1, 2]);
+      var b = new ArrayOperation([">>", 3, 0]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (22), b.t < a.s < b.s < a.t", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 1, 3]);
+      var b = new ArrayOperation([">>", 2, 0]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (23), b.t < a.t < a.s < b.s", function() {
+      var input = [1,2,3,4];
+      var expected = [4,1,3,2];
+      var a = new ArrayOperation([">>", 2, 1]);
+      var b = new ArrayOperation([">>", 3, 0]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    "Transformation: a=Move, b=Move (24), b.t < a.t < b.s < a.s", function() {
+      var input = [1,2,3,4];
+      var expected = [3,1,4,2];
+      var a = new ArrayOperation([">>", 3, 1]);
+      var b = new ArrayOperation([">>", 2, 0]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    // ignorable cases:
+    //  a.s == a.t < b.s < b.t
+    //  a.s == a.t < b.t < b.s
+    //  a.s == a.t < b.s == b.t
+    //  b.s == b.t < a.s < a.t
+    //  b.s == b.t < a.t < a.s
+    //  b.s == b.t < a.s == a.t
+    "Transformation: a=Move, b=Move (25-30): one is NOP", function() {
+      var input = [1,2,3];
+      var expected = [1,3,2];
+      var a = new ArrayOperation([">>", 0, 0]);
+      var b = new ArrayOperation([">>", 1, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    // a.s < a.t == b.s < b.t
+    // b.s < b.t == a.s < a.t
+    "Transformation: a=Move, b=Move (31-32), a.s < a.t == b.s < b.t", function() {
+      var input = [1,2,3];
+      var expected = [1,3,2];
+      var a = new ArrayOperation([">>", 0, 1]);
+      var b = new ArrayOperation([">>", 1, 2]);
+
+      testTransform(a, b, input, expected);
+      testTransform(b, a, input, expected);
+    },
+
+    // conflict cases:
+    // a.t < a.s == b.s < b.t
+    // b.t < a.s == b.s < a.t
+    // a.t < b.t < a.s == b.s
+    // b.t < a.t < a.s == b.s
+    // a.s == b.s < a.t < b.t
+    // a.s == b.s < b.t < a.t
+    // a.s == b.s < a.t == a.t
+    // a.s == b.s == a.t == a.t
+
+    // this is treated the same way in all cases (if transformation is forced):
+    // the second operation takes precedence
+    "Transformation: a=Move, b=Move (33-40), a.s == b.s", function() {
+      var input = [1,2,3];
+      var expected1 = [1,3,2];
+      var expected2 = [2,1,3];
+      var a = new ArrayOperation([">>", 1, 0]);
+      var b = new ArrayOperation([">>", 1, 2]);
+
+      testTransform(a, b, input, expected1);
+      testTransform(b, a, input, expected2);
+    },
+
+
     "Manual merge", function() {
       this.chronicle.open(this.ID4);
       this.ID_M1 = this.chronicle.merge(this.ID6, "manual", {sequence: [this.ID2, this.ID6, this.ID4]});
