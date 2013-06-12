@@ -83,10 +83,17 @@ test.actions = [
 
   "Update heading content", function() {
     var op = [
-      "update", "h1", {
-        "content": [4, "ING", -3]
-      }
+      "update", "h1", "content", [4, "ING", -3]
     ];
+
+    // Alternatively, only one property per command
+    // var op = [
+    //   "update", "h1", "content", [4, "ING", -3]
+    // ];    
+
+    this.doc.exec(op);
+    assert.isEqual("HeadING 1", this.doc.get("h1").content);
+  },
 
     // [3, "abcd", -4, ]
     // var op = ["update", "h1", {
@@ -103,22 +110,10 @@ test.actions = [
     //   "children": ["t1", "v1"]
     // }]
 
-    this.doc.exec(op);
-
-    assert.isEqual("HeadING 1", this.doc.get("h1").content);
-  },
-
-  "Update pos", function() {
-
-  },
-
   "Create a comment", function() {
-
-    var op = ["create", {
+    var op = ["comment", "t1", {
         "id": "c1",
-        "type": "comment",
-        "content": "Hi, I'm a comment",
-        "source": "t1"
+        "content": "Hi, I'm a comment"
       }
     ];
 
@@ -131,19 +126,9 @@ test.actions = [
   },
 
   "Create an annotation", function() {
-
-    //   var op = ["create", {
-    //       "id": "a1",
-    //       "type": "annotation",
-    //       "pos": [1, 4],
-    //       "node": "t1"
-    //     }
-    //   ];
-
     var op = ["annotate", "t1", "content", {
         "id": "a1",
         "type": "idea",
-        // "source": ["t1", "content"]
         "pos": [1, 3]
       }
     ];
@@ -163,30 +148,28 @@ test.actions = [
 
   "Change text, which affects the annotation we just created", function() {
     var op = [
-      "update", "t1", {
-        "content": [1, "EEE"]
-      }
+      "update", "t1", "content", [1, "EEE"]
     ];
 
     this.doc.exec(op);
-    // assert.equal(annotations[0].id, "a1");
+    assert.equal("a1", this.doc.get('a1').id);
     assert.isEqual("TEEEext 1", this.doc.get('t1').content);
     assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
 
   },
 
-  "Change text, which affects the annotation we just created", function() {
-    var op = [
-      "update", "t1", {
-        "content": [1, "EEE"]
-      }
-    ];
+  // "Change text, which affects the annotation we just created", function() {
+  //   var op = [
+  //     "update", "t1", {
+  //       "content": [1, "EEE"]
+  //     }
+  //   ];
 
-    this.doc.exec(op);
-    // assert.equal(annotations[0].id, "a1");
-    assert.isEqual("TEEEext 1", this.doc.get('t1').content);
-    assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
-  },
+  //   this.doc.exec(op);
+  //   // assert.equal(annotations[0].id, "a1");
+  //   assert.isEqual("TEEEext 1", this.doc.get('t1').content);
+  //   assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
+  // },
 
   // "Stick comment to annotation", function() {
   //   // Create a comment that sticks on the annotation
@@ -205,8 +188,8 @@ test.actions = [
   //   comments = this.doc.find("comments", "a1");
   //   assert.equal(comments.length, 1);
   //   assert.equal(comments[0].id, "c2");
-
   // },
+
 
   // "Delete all comments", function() {
   //   var op = [
