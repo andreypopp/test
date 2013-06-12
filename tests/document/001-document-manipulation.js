@@ -148,14 +148,13 @@ test.actions = [
 
   "Change text, which affects the annotation we just created", function() {
     var op = [
-      "update", "t1", "content", [1, "EEE"]
+      "update", "t1", "content", [2, "EEE"]
     ];
 
     this.doc.exec(op);
     assert.equal("a1", this.doc.get('a1').id);
-    assert.isEqual("TEEEext 1", this.doc.get('t1').content);
+    assert.isEqual("TeEEExt 1", this.doc.get('t1').content);
     assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
-
   },
 
   // "Change text, which affects the annotation we just created", function() {
