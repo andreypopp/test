@@ -32,7 +32,12 @@ test.actions = [
 
     this.doc.exec(op);
     assert.isEqual(op[1].content, this.doc.get('h1').content);
+
+    // h1.level should be automatically initialized with 0
+    // TODO: should default to null later, once we support null values
+    assert.isEqual(0, this.doc.get('h1').level);
   },
+
 
   "Create a new text nodes", function() {
     var op = ["create", {
@@ -56,30 +61,30 @@ test.actions = [
     assert.isDefined(this.doc.get('t2'));
   },
 
-  // "Add nodes to content view", function() {
-  //   var op = [
-  //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
-  //   ];
-  //   this.doc.exec(op);
-  //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
-  // },
+  // // "Add nodes to content view", function() {
+  // //   var op = [
+  // //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
+  // //   ];
+  // //   this.doc.exec(op);
+  // //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
+  // // },
 
-  // "Add nodes to content view 2", function() {
-  //   var op = [
-  //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
-  //   ];
-  //   this.doc.exec(op);
-  //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
-  // },
+  // // "Add nodes to content view 2", function() {
+  // //   var op = [
+  // //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
+  // //   ];
+  // //   this.doc.exec(op);
+  // //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
+  // // },
 
-  // "Reposition nodes ", function() {
-  //   var op = [
-  //     "position", "content", {"nodes": ["h1", "t1", "t2"], "target": 0}
-  //   ];
-  //   this.doc.exec(op);
-  //   assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
-  //   console.log('LES DOC', this.doc);
-  // },
+  // // "Reposition nodes ", function() {
+  // //   var op = [
+  // //     "position", "content", {"nodes": ["h1", "t1", "t2"], "target": 0}
+  // //   ];
+  // //   this.doc.exec(op);
+  // //   assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
+  // //   console.log('LES DOC', this.doc);
+  // // },
 
   "Update heading content", function() {
     var op = [
@@ -197,35 +202,26 @@ test.actions = [
     assert.equal(annotations.length, 1);
   },
 
-  // "Update Text by assigning new value", function() {
-  //   var op = [
-  //     "update",
-  //     {
-  //       "id": "text:1",
-  //       "data": {
-  //         "content": "Text Eins"
-  //       }
-  //     }
-  //   ];
+  // // "Update Text by assigning new value", function() {
+  // //   var op = [
+  // //     "update",
+  // //     {
+  // //       "id": "text:1",
+  // //       "data": {
+  // //         "content": "Text Eins"
+  // //       }
+  // //     }
+  // //   ];
 
-  //   this.doc.exec(op);
-  //   assert.isEqual("Text Eins", this.doc.nodes["text:1"].content);
-  // },
+  // //   this.doc.exec(op);
+  // //   assert.isEqual("Text Eins", this.doc.nodes["text:1"].content);
+  // // },
 
-  // "Update numeric value of a heading", function() {
-  //   var op = [
-  //     "update",
-  //     {
-  //       "id": "heading:1",
-  //       "data": {
-  //         "level": 2
-  //       }
-  //     }
-  //   ];
-
-  //   this.doc.exec(op);
-  //   assert.isEqual(2, this.doc.nodes["heading:1"].level);
-  // }
+  "Update numeric value of a heading", function() {
+    var op = ["set", "h1", "level", 2];
+    this.doc.exec(op);
+    assert.isEqual(2, this.doc.nodes["h1"].level);
+  }
 
 ];
 
