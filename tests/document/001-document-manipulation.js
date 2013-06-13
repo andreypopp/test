@@ -124,6 +124,7 @@ test.actions = [
     var annotations = this.doc.find("annotations", "t1");
     assert.equal(annotations.length, 1);
     assert.equal(annotations[0].id, "a1");
+    assert.equal(annotations[0].node, "t1");
 
     // Pos of annotation should be 1, offset 4
     assert.isArrayEqual([1, 3], annotations[0].pos);
@@ -149,9 +150,7 @@ test.actions = [
     ];
 
     this.doc.exec(op);
-    // console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
 
-    console.log('LE DOC', this.doc);
     // Get comments for annotation:1
     comments = this.doc.find("comments", "a1");
     assert.equal(comments.length, 1);
@@ -186,11 +185,14 @@ test.actions = [
     assert.equal(undefined, this.doc.get('c1'));
     assert.equal(undefined, this.doc.get('c2'));
     assert.isDefined(this.doc.get('a1'));
+
+    // console.log('LE DOC', this.doc);
   },
 
   "Update Annotation", function() {
     var op = ["set", "a1", "node", "t2"];
 
+    // console.log('LE GRAPH', this.doc);
     this.doc.exec(op);
 
     // Annotation no longer sticks on text:1
@@ -202,24 +204,19 @@ test.actions = [
     assert.equal(annotations.length, 1);
   },
 
-  // // "Update Text by assigning new value", function() {
-  // //   var op = [
-  // //     "update",
-  // //     {
-  // //       "id": "text:1",
-  // //       "data": {
-  // //         "content": "Text Eins"
-  // //       }
-  // //     }
-  // //   ];
+  "Update Text by assigning new value", function() {
+    var op = [
+      "update", "t1", "content", [5, -1, "Eins"]
+    ];
 
-  // //   this.doc.exec(op);
-  // //   assert.isEqual("Text Eins", this.doc.nodes["text:1"].content);
-  // // },
+    this.doc.exec(op);
+    assert.isEqual("Text Eins", this.doc.get('t1').content);
+  },
 
   "Update numeric value of a heading", function() {
     var op = ["set", "h1", "level", 2];
     this.doc.exec(op);
+
     assert.isEqual(2, this.doc.nodes["h1"].level);
   }
 
