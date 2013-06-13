@@ -86,29 +86,9 @@ test.actions = [
       "update", "h1", "content", [4, "ING", -3]
     ];
 
-    // Alternatively, only one property per command
-    // var op = [
-    //   "update", "h1", "content", [4, "ING", -3]
-    // ];    
-
     this.doc.exec(op);
     assert.isEqual("HeadING 1", this.doc.get("h1").content);
   },
-
-    // [3, "abcd", -4, ]
-    // var op = ["update", "h1", {
-    //   "content": ["+", 3, ""],
-    //   "foo": "doink"
-    // }];
-
-    // var op = ["set", "h1", {
-    //   "foo": "doink"
-    // }]
-
-    // var op = ["set", "h1", {
-    //   "foo": "asdfsdf",
-    //   "children": ["t1", "v1"]
-    // }]
 
   "Create a comment", function() {
     var op = ["comment", "t1", {
@@ -135,8 +115,6 @@ test.actions = [
 
     this.doc.exec(op);
 
-    console.log('LE DOC', this.doc);
-
     // Get annotations for text:1
     var annotations = this.doc.find("annotations", "t1");
     assert.equal(annotations.length, 1);
@@ -146,100 +124,78 @@ test.actions = [
     assert.isArrayEqual([1, 3], annotations[0].pos);
   },
 
-  "Change text, which affects the annotation we just created", function() {
-    var op = [
-      "update", "t1", "content", [2, "EEE"]
-    ];
-
-    this.doc.exec(op);
-    assert.equal("a1", this.doc.get('a1').id);
-    assert.isEqual("TeEEExt 1", this.doc.get('t1').content);
-    assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
-  },
-
   // "Change text, which affects the annotation we just created", function() {
   //   var op = [
-  //     "update", "t1", {
-  //       "content": [1, "EEE"]
-  //     }
+  //     "update", "t1", "content", [2, "EEE"]
   //   ];
 
   //   this.doc.exec(op);
-  //   // assert.equal(annotations[0].id, "a1");
-  //   assert.isEqual("TEEEext 1", this.doc.get('t1').content);
+  //   assert.equal("a1", this.doc.get('a1').id);
+  //   assert.isEqual("TeEEExt 1", this.doc.get('t1').content);
   //   assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
   // },
 
-  // "Stick comment to annotation", function() {
-  //   // Create a comment that sticks on the annotation
-  //   var op = ["create", {
-  //       "id": "c2",
-  //       "type": "comment", // TODO: consider moving that into data object
-  //       "node": "a1",
-  //       "content": "Hello world"
-  //     }
-  //   ];
+  "Stick comment to annotation", function() {
+    // Create a comment that sticks on the annotation
+    var op = ["comment", "a1", {
+        "id": "c2",
+        "content": "Hello world"
+      }
+    ];
 
-  //   this.doc.exec(op);
-  //   // console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
+    this.doc.exec(op);
+    // console.log("this.doc.indexes", util.deepclone(this.doc.indexes));
 
-  //   // Get comments for annotation:1
-  //   comments = this.doc.find("comments", "a1");
-  //   assert.equal(comments.length, 1);
-  //   assert.equal(comments[0].id, "c2");
-  // },
+    console.log('LE DOC', this.doc);
+    // Get comments for annotation:1
+    comments = this.doc.find("comments", "a1");
+    assert.equal(comments.length, 1);
+    assert.equal(comments[0].id, "c2");
+  },
 
+  "Replace old property value with a new value (string)", function() {
+    var op = ["set", "c2", "content", "Meeh"];
+    this.doc.exec(op);
 
-  // "Delete all comments", function() {
-  //   var op = [
-  //     "delete",
-  //     {
-  //       "nodes": ["c1", "c2"]
-  //     }
-  //   ];
+    assert.equal(this.doc.get('c2').content, "Meeh");
+  },
 
-  //   // Delete element, then check indexes again
+  // "Replace old property value with a new value (array)", function() {
+  //   var op = ["set", "a1", "pos", [25,10]];
   //   this.doc.exec(op);
 
-  //   // Get comments for annotation:1
-  //   var comments = this.doc.find("comments", "a1");
-  //   assert.equal(comments.length, 0);
-  //   assert.equal(undefined, this.doc.get('c1'));
-  //   assert.equal(undefined, this.doc.get('c2'));
-  //   assert.isDefined(this.doc.get('a1'));
+  //   assert.isArrayEqual([25, 10], this.doc.get('c2').pos);
   // },
 
-  // "Iteration", function() {
-  //   var count = 0;
-  //   this.doc.each(function() {
-  //     count++;
-  //   }); 
+  "Delete all comments", function() {
+    var op = ["delete", {
+      "nodes": ["c1", "c2"]
+    }];
 
-  //   assert.equal(count, 4);
-  //   console.log(this.doc);
-  // },
+    // Delete element, then check indexes again
+    this.doc.exec(op);
 
-  // "Update Annotation", function() {
-  //   var op = [
-  //     "update",
-  //     {
-  //       "id": "annotation:1",
-  //       "data": {
-  //         "node": "text:2"
-  //       }
-  //     }
-  //   ];
+    // Get comments for annotation:1
+    var comments = this.doc.find("comments", "a1");
+    assert.equal(comments.length, 0);
+    assert.equal(undefined, this.doc.get('c1'));
+    assert.equal(undefined, this.doc.get('c2'));
+    assert.isDefined(this.doc.get('a1'));
+  },
 
-  //   this.doc.exec(op);
+  "Update Annotation", function() {
+    var op = ["set", "a1", "node", "t2"];
 
-  //   // Annotation no longer sticks on text:1
-  //   var annotations = this.doc.find('annotations', 'text:1');
-  //   assert.equal(annotations.length, 0);
+    this.doc.exec(op);
 
-  //   // Should be returned when querying for annotations, text:2
-  //   annotations = this.doc.find('annotations', 'text:2');
-  //   assert.equal(annotations.length, 1);
-  // },
+    // Annotation no longer sticks on text:1
+    var annotations = this.doc.find('annotations', 't1');
+    assert.equal(annotations.length, 0);
+
+    // Should be returned when querying for annotations, text:2
+    annotations = this.doc.find('annotations', 't2');
+    assert.equal(annotations.length, 1);
+  },
 
   // "Update Text by assigning new value", function() {
   //   var op = [
@@ -269,56 +225,8 @@ test.actions = [
 
   //   this.doc.exec(op);
   //   assert.isEqual(2, this.doc.nodes["heading:1"].level);
-  // },
+  // }
 
-  // "OT Updates for multiple properties", function() {
-  //   var op = [
-  //     "insert",
-  //     {
-  //       "id": "comment:3",
-  //       "type": "comment",
-  //       "data": {
-  //         "node": "text:2",
-  //         "content": "Doe"
-  //       }
-  //     }
-  //   ];
-
-  //   var op2 = [
-  //     "update",
-  //     {
-  //       "id": "comment:3",
-  //       "data": {
-  //         "content": ["John ", 3]
-  //       }
-  //     }
-  //   ];
-
-  //   this.doc.apply(op);
-  //   this.doc.apply(op2);
-
-  //   var node = this.doc.nodes["comment:3"];
-  //   assert.equal(node.content, "John Doe");
-
-  // },
-
-  // "Support objects as values", function() {
-
-  //   var op = [
-  //     "update",
-  //     {
-  //       "id": "annotation:1",
-  //       "data": {
-  //         "pos": [1,27]
-  //       }
-  //     }
-  //   ];
-
-  //   this.doc.apply(op);
-
-  //   var node = this.doc.nodes["annotation:1"];
-  //   assert.isTrue(_.isEqual(node.pos, [1, 27]));
-  // },
 ];
 
 root.Substance.registerTest(['Document', 'Document Manipulation'], test);
