@@ -11,13 +11,13 @@ var TEXT4 = "Lorem ipsum dolor sit amet";
 var TEXT5 = "Lorem sit amet";
 var TEXT_M1 = "Lorem ipsum sit amet";
 
-var OP1 = new TextOperation(['+', 0, "Lorem amet"]);
-var OP2 = new TextOperation(['+', 5, " ipsum"]);
-var OP3 = new TextOperation(['+', 12, "dolor "]);
-var OP4 = new TextOperation(['+', 18, "sit "]);
+var OP1 = TextOperation.Insert(0, "Lorem amet");
+var OP2 = TextOperation.Insert(5, " ipsum");
+var OP3 = TextOperation.Insert(12, "dolor ");
+var OP4 = TextOperation.Insert(18, "sit ");
 
-var OP5_1 = new TextOperation(['+', 5, " sit"]);
-var OP5_2 = new TextOperation(['+', 6, "sit "]);
+var OP5_1 = TextOperation.Insert(5, " sit");
+var OP5_2 = TextOperation.Insert(6, "sit ");
 
 // Index:
 //
@@ -70,8 +70,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem ipsum";
       var expected = "Lorem bla ipsum blupp";
-      var a = new TextOperation(['+', 6, "bla "]);
-      var b = new TextOperation(['+', 11, " blupp"]);
+      var a = TextOperation.Insert(6, "bla ");
+      var b = TextOperation.Insert(11, " blupp");
 
       // transformation should be symmetric in this case
       testTransform(a, b, input, expected);
@@ -83,8 +83,8 @@ var TextOperationTest = function() {
       var input = "Lorem ipsum";
       var expected = "Lorem bla blupp ipsum";
       var expected_2 = "Lorem blupp bla ipsum";
-      var a = new TextOperation(['+', 6, "bla "]);
-      var b = new TextOperation(['+', 6, "blupp "]);
+      var a = TextOperation.Insert(6, "bla ");
+      var b = TextOperation.Insert(6, "blupp ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected_2);
@@ -94,8 +94,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem ipsum dolor sit amet";
       var expected = "Lorem dolor amet";
-      var a = new TextOperation(['-', 6, "ipsum "]);
-      var b = new TextOperation(['-', 18, "sit "]);
+      var a = TextOperation.Delete(6, "ipsum ");
+      var b = TextOperation.Delete(18, "sit ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -105,8 +105,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem ipsum dolor sit amet";
       var expected = "Lorem amet";
-      var a = new TextOperation(['-', 6, "ipsum dolor sit "]);
-      var b = new TextOperation(['-', 12, "dolor "]);
+      var a = TextOperation.Delete(6, "ipsum dolor sit ");
+      var b = TextOperation.Delete(12, "dolor ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -116,8 +116,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem ipsum dolor sit amet";
       var expected = "Lorem amet";
-      var a = new TextOperation(['-', 6, "ipsum dolor "]);
-      var b = new TextOperation(['-', 6, "ipsum dolor sit "]);
+      var a = TextOperation.Delete(6, "ipsum dolor ");
+      var b = TextOperation.Delete(6, "ipsum dolor sit ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -128,8 +128,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem dolor sit amet";
       var expected = "Lorem ipsum dolor amet";
-      var a = new TextOperation(['+', 6, "ipsum "]);
-      var b = new TextOperation(['-', 12, "sit "]);
+      var a = TextOperation.Insert(6, "ipsum ");
+      var b = TextOperation.Delete(12, "sit ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
@@ -140,8 +140,8 @@ var TextOperationTest = function() {
 
       var input = "Lorem dolor sit amet";
       var expected = "Lorem amet";
-      var a = new TextOperation(['+', 12, "ipsum "]);
-      var b = new TextOperation(['-', 6, "dolor sit "]);
+      var a = TextOperation.Insert(12, "ipsum ");
+      var b = TextOperation.Delete(6, "dolor sit ");
 
       testTransform(a, b, input, expected);
       testTransform(b, a, input, expected);
