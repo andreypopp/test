@@ -185,21 +185,18 @@ test.actions = [
     assert.equal(undefined, this.doc.get('c1'));
     assert.equal(undefined, this.doc.get('c2'));
     assert.isDefined(this.doc.get('a1'));
-
-    // console.log('LE DOC', this.doc);
   },
 
   "Update Annotation", function() {
     var op = ["set", "a1", "node", "t2"];
 
-    // console.log('LE GRAPH', this.doc);
     this.doc.exec(op);
 
-    // Annotation no longer sticks on text:1
+    // Annotation no longer sticks on t1
     var annotations = this.doc.find('annotations', 't1');
     assert.equal(annotations.length, 0);
 
-    // Should be returned when querying for annotations, text:2
+    // Should be returned when querying for annotations, t2
     annotations = this.doc.find('annotations', 't2');
     assert.equal(annotations.length, 1);
   },
@@ -216,10 +213,12 @@ test.actions = [
   "Update numeric value of a heading", function() {
     var op = ["set", "h1", "level", 2];
     this.doc.exec(op);
-
     assert.isEqual(2, this.doc.nodes["h1"].level);
-  }
+  },
 
+  "Revert the latest change", function() {
+    this.doc.rewind();
+  }
 ];
 
 root.Substance.registerTest(['Document', 'Document Manipulation'], test);
