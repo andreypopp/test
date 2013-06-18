@@ -226,9 +226,9 @@ test.actions = [
     assert.isEqual(2, this.doc.nodes["h1"].level);
   },
 
-  "Revert the latest change", function() {
-    // this.doc.rewind();
-  }
+  // "Revert the latest change", function() {
+  //   // this.doc.rewind();
+  // }
 ];
 
 root.Substance.registerTest(['Document', 'Document Manipulation'], test);
