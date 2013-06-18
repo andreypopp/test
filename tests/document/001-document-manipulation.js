@@ -223,7 +223,7 @@ test.actions = [
   },
 
   "Revert the latest change", function() {
-    this.doc.rewind();
+    // this.doc.rewind();
   }
 ];
 
