@@ -160,6 +160,17 @@ var TextOperationTest = function() {
       assert.isEqual(TEXT_M1, this.document.getText());
     },
 
+    "Compound: 'bla' - 'blapp' | 'blupp'", function() {
+      var input = "bla";
+      var expected1 = "blappupp";
+      var expected2 = "bluppapp";
+      var a = TextOperation.fromOT("bla", [2, -1, "app"]);
+      var b = TextOperation.fromOT("bla", [2, -1, "upp"]);
+
+      testTransform(a, b, input, expected1);
+      testTransform(b, a, input, expected2);
+    },
+
   ];
 
 };

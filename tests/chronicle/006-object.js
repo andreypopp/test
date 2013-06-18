@@ -5,6 +5,7 @@ var util = root.Substance.util;
 var errors = root.Substance.errors;
 var Chronicle = root.Substance.Chronicle;
 var ObjectOperation = Chronicle.OT.ObjectOperation;
+var TextOperation = Chronicle.OT.TextOperation;
 
 function testTransform(a, b, input, expected) {
   var t = ObjectOperation.transform(a, b);
@@ -84,16 +85,15 @@ var ObjectOperationTest = function() {
       var path = ["a"];
       var val1 = "bla";
       var val2 = "blupp";
-      var expected1 = {a: "blupp"};
-      var expected2 = {a: "bla"};
 
       var a = ObjectOperation.Create(path, val1);
       var b = ObjectOperation.Create(path, val2);
 
       assert.isTrue(ObjectOperation.hasConflict(a, b));
 
-      testTransform(a, b, {}, expected1);
-      testTransform(b, a, {}, expected2);
+      assert.exception(errors.ChronicleError, function() {
+        t = ObjectOperation.transform(a, b);
+      });
     },
 
     "Transformation: delete/delete (conflict)", function() {
@@ -140,7 +140,7 @@ var ObjectOperationTest = function() {
     "Transformation: delete/update (conflict)", function() {
       var path = ["a"];
       var a = ObjectOperation.Delete(path, "bla");
-      var b = ObjectOperation.Update(path, "bla", "blupp");
+      var b = ObjectOperation.Update(path, TextOperation.fromOT("bla", [2, -1, "upp"]));
 
       var input = {a : "bla"};
       var expected1 = {a: "blupp"};
@@ -155,36 +155,22 @@ var ObjectOperationTest = function() {
     "Transformation: create/update (conflict)", function() {
       var path = ["a"];
       var a = ObjectOperation.Create(path, "bla");
-      var b = ObjectOperation.Update(path, "foo", "bar");
-      var expected1 = {a: "bar"};
-      var expected2 = {a: "bla"};
-      var obj, t;
+      var b = ObjectOperation.Update(path, TextOperation.fromOT("foo", [-3, "bar"]));
 
       assert.isTrue(ObjectOperation.hasConflict(a, b));
-
-      // Note: this is a ill-posed case, as create will fail when the value already exists.
-
-      t = ObjectOperation.transform(a, b);
-      obj = t[1].apply(a.apply({}));
-      assert.isObjectEqual(expected1, obj);
-      obj = t[0].apply(b.apply({a: "foo"}))
-      assert.isObjectEqual(expected1, obj);
-
-      t = ObjectOperation.transform(b, a);
-      obj = t[1].apply(b.apply({a: "foo"}));
-      assert.isObjectEqual(expected2, obj);
-      obj = t[0].apply(a.apply({}))
-      assert.isObjectEqual(expected2, obj);
+      assert.exception(errors.ChronicleError, function() {
+        t = ObjectOperation.transform(a, b);
+      });
     },
 
     "Transformation: update/update (conflict)", function() {
       var path = ["a"];
-      var a = ObjectOperation.Update(path, "bla", "blapp");
-      var b = ObjectOperation.Update(path, "bla", "blupp");
+      var a = ObjectOperation.Update(path, TextOperation.fromOT("bla", [2, -1, "app"]));
+      var b = ObjectOperation.Update(path, TextOperation.fromOT("bla", [2, -1, "upp"]));
 
       var input = {a : "bla"};
-      var expected1 = {a: "blupp"};
-      var expected2 = {a: "blapp"};
+      var expected1 = {a: "blappupp"};
+      var expected2 = {a: "bluppapp"};
 
       assert.isTrue(ObjectOperation.hasConflict(a, b));
 
