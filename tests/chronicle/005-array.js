@@ -217,6 +217,36 @@ var ArrayOperationTest = function() {
       testTransform(b, a, input, expected2);
     },
 
+    "Update: [1,2,3,4,5] -> [2,1,3,4]", function() {
+      var input = [1,2,3,4,5];
+      var expected = [2,1,3,4];
+
+      var op = ArrayOperation.Update(input, expected);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    },
+
+    "Update: [1,2,3,4,5] -> []", function() {
+      var input = [1,2,3,4,5];
+      var expected = [];
+
+      var op = ArrayOperation.Update(input, expected);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    },
+
+    "Update: [1,2,3,4,5] -> [5,4,3,2,1]", function() {
+      var input = [1,2,3,4,5];
+      var expected = [5,4,3,2,1];
+
+      var op = ArrayOperation.Update(input, expected);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    },
+
     //     A = [1,2,3,4,5], a = [>>,,], b = [>>,,]
     //     A  - a ->  [1,2,3,4,5]   - b' ->   []   => b'= [>>,,]
     //     A  - b ->  [1,2,3,4,5]   - a' ->   []   => a'= [>>,,]
