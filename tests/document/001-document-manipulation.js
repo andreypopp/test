@@ -14,10 +14,10 @@ test.setup = function() {
 
 test.actions = [
   "Initialization", function() {
-    
+
   },
 
-  "Check if valid document has been constructed", function() {    
+  "Check if valid document has been constructed", function() {
     assert.isArrayEqual(["content", "figures", "publications"], this.doc.get('document').views);
     assert.isTrue(_.isArray(this.doc.get('content').nodes));
   },
@@ -61,30 +61,30 @@ test.actions = [
     assert.isDefined(this.doc.get('t2'));
   },
 
-  // // "Add nodes to content view", function() {
-  // //   var op = [
-  // //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
-  // //   ];
-  // //   this.doc.exec(op);
-  // //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
-  // // },
+  "Add nodes to content view", function() {
+    var op = [
+      "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
+  },
 
-  // // "Add nodes to content view 2", function() {
-  // //   var op = [
-  // //     "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
-  // //   ];
-  // //   this.doc.exec(op);
-  // //   assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
-  // // },
+  "Add nodes to content view 2", function() {
+    var op = [
+      "position", "content", {"nodes": ["t2", "h1", "t1"], "target": -1}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["t2", "h1", "t1"], this.doc.get('content').nodes);
+  },
 
-  // // "Reposition nodes ", function() {
-  // //   var op = [
-  // //     "position", "content", {"nodes": ["h1", "t1", "t2"], "target": 0}
-  // //   ];
-  // //   this.doc.exec(op);
-  // //   assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
-  // //   console.log('LES DOC', this.doc);
-  // // },
+  "Reposition nodes ", function() {
+    var op = [
+      "position", "content", {"nodes": ["h1", "t1", "t2"], "target": 0}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
+    console.log('LES DOC', this.doc);
+  },
 
   "Update heading content", function() {
     var op = [
@@ -114,7 +114,7 @@ test.actions = [
     var op = ["annotate", "t1", "content", {
         "id": "a1",
         "type": "idea",
-        "pos": [1, 3]
+        "range": {start: 1, length: 3}
       }
     ];
 
@@ -122,24 +122,25 @@ test.actions = [
 
     // Get annotations for text:1
     var annotations = this.doc.find("annotations", "t1");
-    assert.equal(annotations.length, 1);
-    assert.equal(annotations[0].id, "a1");
-    assert.equal(annotations[0].node, "t1");
+    assert.isEqual(1, annotations.length);
 
-    // Pos of annotation should be 1, offset 4
-    assert.isArrayEqual([1, 3], annotations[0].pos);
+    var a1 = this.doc.get('a1');
+    assert.equal("a1", a1.id);
+    assert.equal("t1", a1.node, "t1");
+    assert.isEqual(1, a1.range.start);
+    assert.isEqual(3, a1.range.length);
   },
 
-  // "Change text, which affects the annotation we just created", function() {
-  //   var op = [
-  //     "update", "t1", "content", [2, "EEE"]
-  //   ];
+  "Change text, which affects the annotation we just created", function() {
+    var op = [
+      "update", "t1", "content", [2, "EEE"]
+    ];
+    this.doc.exec(op);
 
-  //   this.doc.exec(op);
-  //   assert.equal("a1", this.doc.get('a1').id);
-  //   assert.isEqual("TeEEExt 1", this.doc.get('t1').content);
-  //   assert.isArrayEqual([1, 6], this.doc.get('a1').pos);
-  // },
+    var a1 = this.doc.get('a1');
+    assert.isEqual(1, a1.range.start);
+    assert.isEqual(6, a1.range.length);
+  },
 
   "Stick comment to annotation", function() {
     // Create a comment that sticks on the annotation
@@ -188,6 +189,11 @@ test.actions = [
   },
 
   "Update Annotation", function() {
+
+    // TODO: this does not really make sense. Annotations have a range
+    // which can not be transferred to another node.
+    // Can this test be changed so that it makes more sense?
+
     var op = ["set", "a1", "node", "t2"];
 
     this.doc.exec(op);
@@ -203,11 +209,11 @@ test.actions = [
 
   "Update Text by assigning new value", function() {
     var op = [
-      "update", "t1", "content", [5, -1, "Eins"]
+      "update", "t2", "content", [5, -1, "Zwei"]
     ];
 
     this.doc.exec(op);
-    assert.isEqual("Text Eins", this.doc.get('t1').content);
+    assert.isEqual("Text Zwei", this.doc.get('t2').content);
   },
 
   "Update numeric value of a heading", function() {
