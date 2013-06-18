@@ -207,6 +207,17 @@ test.actions = [
     assert.equal(annotations.length, 1);
   },
 
+  // Coming soon
+  "Update Annotation Range", function() {
+
+    var op = ["update", "a1", "range", {start: 1, length: 4}];
+    this.doc.exec(op);
+
+    var a1 = this.doc.get('a1');
+    assert.isEqual(1, a1.range.start);
+    assert.isEqual(4, a1.range.length);
+  },
+
   "Update Text by assigning new value", function() {
     var op = [
       "update", "t2", "content", [5, -1, "Zwei"]
