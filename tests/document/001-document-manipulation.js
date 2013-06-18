@@ -165,13 +165,6 @@ test.actions = [
     assert.equal(this.doc.get('c2').content, "Meeh");
   },
 
-  // "Replace old property value with a new value (array)", function() {
-  //   var op = ["set", "a1", "pos", [25,10]];
-  //   this.doc.exec(op);
-
-  //   assert.isArrayEqual([25, 10], this.doc.get('c2').pos);
-  // },
-
   "Delete all comments", function() {
     var op = ["delete", {
       "nodes": ["c1", "c2"]

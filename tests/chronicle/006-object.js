@@ -4,9 +4,9 @@ var assert = root.Substance.assert;
 var util = root.Substance.util;
 var errors = root.Substance.errors;
 var Chronicle = root.Substance.Chronicle;
-var ObjectOperation = Chronicle.OT.ObjectOperation;
-var TextOperation = Chronicle.OT.TextOperation;
-var ArrayOperation = Chronicle.OT.ArrayOperation;
+var ObjectOperation = Chronicle.ot.ObjectOperation;
+var TextOperation = Chronicle.ot.TextOperation;
+var ArrayOperation = Chronicle.ot.ArrayOperation;
 
 function testTransform(a, b, input, expected) {
   var t = ObjectOperation.transform(a, b);

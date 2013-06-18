@@ -2,7 +2,7 @@
 
 var assert = root.Substance.assert;
 var Chronicle = root.Substance.Chronicle;
-var ArrayOperation = Chronicle.OT.ArrayOperation;
+var ArrayOperation = Chronicle.ot.ArrayOperation;
 
 // Index:
 //

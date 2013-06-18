@@ -2,7 +2,7 @@
 
 var assert = root.Substance.assert;
 var Chronicle = root.Substance.Chronicle;
-var TextOperation = Chronicle.OT.TextOperation;
+var TextOperation = Chronicle.ot.TextOperation;
 
 var TEXT1 = "Lorem amet";
 var TEXT2 = "Lorem ipsum amet";
