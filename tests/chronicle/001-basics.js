@@ -57,6 +57,12 @@ var Basics = function() {
       assert.isArrayEqual([ROOT, C1.id], this.index.list());
     },
 
+    "Every Ref should reference an existing change", function() {
+      assert.exception(errors.ChronicleError, function() {
+        this.index.setRef("FAIL", "balla");
+      }, this);
+    },
+
     "Record", function() {
       var id = this.next_uuid();
       this.chronicle.record({op: "plus", val: 1});
