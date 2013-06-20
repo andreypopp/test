@@ -146,6 +146,7 @@ var SCHEMA = {
   }
 };
 
+
 var OP1 = ["create", { "id": "document", "type": "document", "views": ["content", "figures"]} ];
 var OP2 = ["create", { "id": "content", "type": "view", "nodes": []} ];
 var OP3 = ["create", { "id": "h1", "type": "heading", "content": "Heading 1" } ];
@@ -156,6 +157,16 @@ var OP7 = [ "update", "content", "nodes", [">>", 1, 0] ];
 var OP8 = ["create", { "id": "text2", "type": "text", "content": "This is text2." } ];
 var OP9 = ["push", "content", "nodes", {"value": "text2"} ];
 
+// Graph:
+//
+//  ROOT -    1 -   2 -   3 -   4 -   5 -   6 -   7
+//                              |                   \
+//                              |                     M1 (5,6,8,9,7)
+//                              |                   /
+//                              | -   8 -   9 -    -
+//
+//
+//
 
 test.setup = function() {
   this.graph = new Substance.Data.VersionedGraph(SCHEMA);
@@ -164,7 +175,7 @@ test.setup = function() {
   this.adapter = this.graph.chronicle.versioned;
 
   this.ID = ["ROOT"];
-  this.M = [];
+  this.M = ["ROOT"];
 
   var self = this;
   this.CHECKS = {"ROOT": function() {
@@ -252,7 +263,11 @@ test.actions = [
     this.ID.push(this.chronicle.getState());
 
     this.chronicle.open(this.ID[7]);
-    this.chronicle.merge(this.ID[9], "manual", {sequence: [this.ID[5], this.ID[6], this.ID[8], this.ID[9], this.ID[7]] });
+    var mergeOptions = {
+      sequence: [this.ID[5], this.ID[6], this.ID[8], this.ID[9], this.ID[7]],
+      force: true
+    };
+    this.chronicle.merge(this.ID[9], "manual", mergeOptions);
     this.M.push(this.chronicle.getState());
 
     assert.isArrayEqual(["text1", "h1", "text2"], this.graph.get("content").nodes);
