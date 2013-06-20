@@ -83,7 +83,22 @@ test.actions = [
     ];
     this.doc.exec(op);
     assert.isArrayEqual(["h1", "t1", "t2"], this.doc.get('content').nodes);
-    console.log('LES DOC', this.doc);
+  },
+
+  "Move down h1 by one", function() {
+    var op = [
+      "position", "content", {"nodes": ["h1"], "target": 1}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["t1", "h1", "t2"], this.doc.get('content').nodes);
+  },
+
+  "Move down h1 by one again", function() {
+    var op = [
+      "position", "content", {"nodes": ["h1"], "target": 2}
+    ];
+    this.doc.exec(op);
+    assert.isArrayEqual(["t1", "t2", "h1"], this.doc.get('content').nodes);
   },
 
   "Update heading content", function() {
