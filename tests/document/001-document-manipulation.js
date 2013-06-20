@@ -241,6 +241,22 @@ test.actions = [
     assert.isEqual(2, this.doc.nodes["h1"].level);
   },
 
+  "Hide nodes from view", function() {
+    var op = ["hide", "content", {"nodes": ["t1", "t2"]}];
+
+    this.doc.exec(op);
+    assert.isArrayEqual(["h1"], this.doc.get('content').nodes);
+  },
+
+  "Delete nodes from graph and view(s)", function() {
+    var op = ["delete", {"nodes": ["t1", "t2"]}];
+
+    this.doc.exec(op);
+    assert.isUndefined(this.doc.get('t1'));
+    assert.isUndefined(this.doc.get('t2'));
+    assert.isArrayEqual(["h1"], this.doc.get('content').nodes);
+  },
+
   // "Revert the latest change", function() {
   //   // this.doc.rewind();
   // }
