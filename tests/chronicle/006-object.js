@@ -285,7 +285,7 @@ ObjectOperationTest.__prototype__ = function() {
     this.chronicle = Chronicle.create(this.index);
 
     ID_IDX = 1;
-    Chronicle.uuid = this.uuid;
+    this.chronicle.uuid = this.uuid;
 
     this.obj = {};
     this.fixture();

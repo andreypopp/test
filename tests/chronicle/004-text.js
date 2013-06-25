@@ -185,11 +185,12 @@ TextOperationTest.__prototype__ = function() {
 
   this.setup = function() {
     Chronicle.HYSTERICAL = true;
+
     this.index = Chronicle.Index.create();
     this.chronicle = Chronicle.create(this.index);
 
     ID_IDX = 1;
-    Chronicle.uuid = this.uuid;
+    this.chronicle.uuid = this.uuid;
 
     this.document = new TestDocument(this.chronicle);
     this.fixture();
