@@ -257,6 +257,26 @@ test.actions = [
     assert.isArrayEqual(["h1"], this.doc.get('content').nodes);
   },
 
+  "Add new text element to the bottom", function() {
+    var op = ["create", {
+        "id": "t3",
+        "type": "text",
+        "content": "Text 3"
+      }
+    ];
+
+    this.doc.exec(op);
+    
+    assert.isDefined(this.doc.get('t3'));
+    
+    var op = [
+      "position", "content", {"nodes": ["t3"], "target": -1}
+    ];
+    this.doc.exec(op);
+    
+    assert.isArrayEqual(["h1", "t3"], this.doc.get('content').nodes);
+  }
+
   // "Revert the latest change", function() {
   //   // this.doc.rewind();
   // }
