@@ -16,11 +16,11 @@ var ROOT = Chronicle.ROOT;
 //    |                - 05 - 06
 //      - 07 - 08
 
-var C1 = new Chronicle.Change(ROOT, "bla", {id: "01"});
+var C1 = new Chronicle.Change("01", ROOT, "bla");
 var OP = function(op, val, id, parent) {
   var data = { op: op, val: val };
   var options = { id: id };
-  return new Chronicle.Change(parent, data, options);
+  return new Chronicle.Change(id, parent, data);
 };
 var PLUS = function(id, parents) {
   return OP("plus", 1, id, parents);
