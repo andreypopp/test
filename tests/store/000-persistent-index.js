@@ -21,10 +21,10 @@ function PersistentIndexTest(impl) {
   this.actions = [
 
     "Add should store change", function() {
-      this.index.add(new Change("ROOT", {val: 1}, {id: 1}));
-      this.index.add(new Change(1, {val: 2}, {id: 2}));
-      this.index.add(new Change(2, {val: 3}, {id: 3}));
-      this.index.add(new Change(1, {val: 4}, {id: 4}));
+      this.index.add(new Change(1, "ROOT", {val: 1}));
+      this.index.add(new Change(2, 1, {val: 2}));
+      this.index.add(new Change(3, 2, {val: 3}));
+      this.index.add(new Change(4, 1, {val: 4}));
 
       var keys = this.changes.keys().slice(0);
       assert.isArrayEqual([1, 2, 3, 4], keys.sort());
@@ -48,7 +48,7 @@ function PersistentIndexTest(impl) {
     },
 
     "Remove change", function() {
-      this.index.add(new Change(1, {val: 5}, {id: 5}));
+      this.index.add(new Change(5, 1, {val: 5}));
       assert.isDefined(this.changes.get(5));
       this.index.remove(5);
       assert.isUndefined(this.changes.get(5));
