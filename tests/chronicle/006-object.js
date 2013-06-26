@@ -40,7 +40,7 @@ var ObjectOperationTest = function() {
       var expected = {a: { b: "bla"} };
       var op = ObjectOperation.Create(path, val);
 
-      var obj = {};
+      var obj = {"a": {}};
       op.apply(obj);
 
       assert.isObjectEqual(expected, obj);
