@@ -4,6 +4,7 @@ var _ = root._;
 var Substance = root.Substance;
 var util = Substance.util;
 var assert = Substance.assert;
+var ot = root.Substance.Chronicle.ot;
 
 var test = {};
 var SCHEMA = {
@@ -150,12 +151,12 @@ var SCHEMA = {
 var OP1 = ["create", { "id": "document", "type": "document", "views": ["content", "figures"]} ];
 var OP2 = ["create", { "id": "content", "type": "view", "nodes": []} ];
 var OP3 = ["create", { "id": "h1", "type": "heading", "content": "Heading 1" } ];
-var OP4 = ["push", "content", "nodes", {"value": "h1"} ];
+var OP4 = ["update", "content", "nodes", ot.ArrayOperation.Insert(0, "h1")];
 var OP5 = ["create", { "id": "text1", "type": "text", "content": "This is text1." } ];
-var OP6 = ["push", "content", "nodes", {"value": "text1"} ];
-var OP7 = [ "update", "content", "nodes", [">>", 1, 0] ];
+var OP6 = ["update", "content", "nodes", ot.ArrayOperation.Insert(1, "text1") ];
+var OP7 = ["update", "content", "nodes", ot.ArrayOperation.Move(1, 0) ];
 var OP8 = ["create", { "id": "text2", "type": "text", "content": "This is text2." } ];
-var OP9 = ["push", "content", "nodes", {"value": "text2"} ];
+var OP9 = ["update", "content", "nodes", ot.ArrayOperation.Insert(1, "text2") ];
 
 // Graph:
 //
