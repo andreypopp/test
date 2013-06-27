@@ -151,7 +151,7 @@ test.fixture3 = function() {
     val: { a: { foo: "bar"}, bla: "blupp" },
   }));
 
-}
+};
 
 test.fixture4 = function() {
   this.graph = new Substance.Data.Graph(SCHEMA3);
@@ -159,8 +159,8 @@ test.fixture4 = function() {
 };
 
 function getIds(arr) {
-  return _.map(arr, function(n) {return n.id});
-};
+  return _.map(arr, function(n) { return n.id; });
+}
 
 test.actions = [
   "Load Fixture 1", function() {

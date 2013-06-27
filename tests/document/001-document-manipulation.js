@@ -2,9 +2,9 @@
 
 var _ = root._;
 var assert = root.Substance.assert;
-var util = root.Substance.util;
+//var util = root.Substance.util;
 var Document = root.Substance.Document;
-var Data = root.Substance.Data;
+//var Data = root.Substance.Data;
 
 var test = {};
 
@@ -168,7 +168,7 @@ test.actions = [
     this.doc.exec(op);
 
     // Get comments for annotation:1
-    comments = this.doc.find("comments", "a1");
+    var comments = this.doc.find("comments", "a1");
     assert.equal(comments.length, 1);
     assert.equal(comments[0].id, "c2");
   },
@@ -266,14 +266,14 @@ test.actions = [
     ];
 
     this.doc.exec(op);
-    
+
     assert.isDefined(this.doc.get('t3'));
-    
-    var op = [
+
+    op = [
       "position", "content", {"nodes": ["t3"], "target": -1}
     ];
     this.doc.exec(op);
-    
+
     assert.isArrayEqual(["h1", "t3"], this.doc.get('content').nodes);
   }
 
