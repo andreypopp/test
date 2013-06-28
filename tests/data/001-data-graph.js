@@ -99,6 +99,28 @@ var SCHEMA3 = {
   }
 };
 
+var SCHEMA4 = {
+  types: {
+    item: {},
+    linked_item: {
+      parent: "item",
+      properties: {
+        next: "item"
+      }
+    },
+    collection: {
+      properties: {
+        items: ["array", "item"]
+      }
+    },
+    table: {
+      properties: {
+        items: ["array", "array", "item"]
+      }
+    }
+  }
+};
+
 test.fixture1 = function() {
   this.graph = new Substance.Data.Graph(SCHEMA1);
   this.schema = this.graph.schema;
@@ -156,6 +178,17 @@ test.fixture3 = function() {
 test.fixture4 = function() {
   this.graph = new Substance.Data.Graph(SCHEMA3);
   this.schema = this.graph.schema;
+};
+
+test.fixture5 = function() {
+  this.graph = new Substance.Data.Graph(SCHEMA4);
+  this.schema = this.graph.schema;
+
+  this.graph.create({id: "i1", type: "linked_item", next: null});
+  this.graph.create({id: "i2", type: "linked_item", next: "i1"});
+  this.graph.create({id: "i3", type: "linked_item", next: "i2"});
+  this.graph.create({id: "c1", type: "collection", items: ["i1", "i3"]});
+  this.graph.create({id: "t1", type: "table", items: [["i1", "i3"], ["i2", "i3"]]});
 };
 
 function getIds(arr) {
@@ -417,6 +450,34 @@ test.actions = [
     assert.isArrayEqual(["bar1"], this.graph.indexes.bars);
     assert.isArrayEqual(["bar1"], this.graph.indexes.by_category.bla);
     assert.isUndefined(this.graph.indexes.by_category.blupp);
+  },
+
+  "Load Fixture 5", function() {
+    this.fixture5();
+  },
+
+  "Query: resolve referenced nodes", function() {
+    var path = ["i2", "next"];
+    var val = this.graph.get(path);
+    assert.isEqual("i1", val);
+
+    var node = this.graph.query(path);
+    assert.isEqual("i1", node.id);
+  },
+
+  "Query: resolve arrays of references", function() {
+    var path = ["c1", "items"];
+    var val = this.graph.get(path);
+    assert.isArrayEqual(["i1", "i3"], val);
+
+    var nodes = this.graph.query(path);
+    var ids = getIds(nodes);
+    assert.isArrayEqual(["i1", "i3"], ids);
+
+    path = ["t1", "items"];
+    nodes = this.graph.query(path);
+    var ids = [getIds(nodes[0]), getIds(nodes[1])];
+    assert.isObjectEqual([["i1", "i3"], ["i2", "i3"]], ids);
   },
 
 ];
