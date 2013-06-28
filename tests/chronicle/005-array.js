@@ -293,6 +293,36 @@ var ArrayOperationTest = function() {
       assert.isArrayEqual(ARR_M1, this.array);
     },
 
+    "Delete 3: [1,2,3,4,5] -> [1,2,4,5]", function() {
+      var input = [1,2,3,4,5];
+      var expected = [1,2,4,5];
+
+      var op = ArrayOperation.Delete(input, 3);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    },
+
+    "Pop: [1,2,3,4,5] -> [1,2,3,4]", function() {
+      var input = [1,2,3,4,5];
+      var expected = [1,2,3,4];
+
+      var op = ArrayOperation.Pop(input);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    },
+
+    "Push: [1,2,3,4] -> [1,2,3,4,6]", function() {
+      var input = [1,2,3,4];
+      var expected = [1,2,3,4,6];
+
+      var op = ArrayOperation.Push(input, 6);
+      var output = op.apply(input);
+
+      assert.isArrayEqual(expected, output);
+    }
+
   ];
 
 };

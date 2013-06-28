@@ -480,6 +480,12 @@ test.actions = [
     assert.isObjectEqual([["i1", "i3"], ["i2", "i3"]], ids);
   },
 
+  "Data.Array.Delete: ", function() {
+    var path = ["c1", "items"];
+    this.graph.delete(path, "i2");
+    assert.isArrayEqual(["i1", "i3"], this.graph.get(path));
+  }
+
 ];
 
 root.Substance.registerTest(['Data', 'Graph'], test);
