@@ -43,8 +43,7 @@ var SCHEMA = {
 
 test.setup = function() {
   this.store = new MemoryStore();
-  var memoryGraph = new Substance.Data.Graph(SCHEMA);
-  this.graph = new Substance.Data.PersistentGraph(this.store, memoryGraph);
+  this.graph = new Substance.Data.Graph(SCHEMA, {store: this.store});
   this.nodes = this.graph.__nodes__;
 };
 
@@ -93,9 +92,7 @@ test.actions = [
   },
 
   "Import: persisted graph should be restored", function() {
-    var memoryGraph = new Substance.Data.Graph(SCHEMA);
-    var graph = new Substance.Data.PersistentGraph(this.store, memoryGraph);
-
+    var graph = new Substance.Data.Graph(SCHEMA, {store: this.store}).load();
     var actual = graph.get(NODE2.id);
     assert.isObjectEqual(NODE2, actual);
   }

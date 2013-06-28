@@ -5,8 +5,10 @@ var Substance = root.Substance;
 var util = Substance.util;
 var assert = Substance.assert;
 var ot = root.Substance.Chronicle.ot;
+var Chronicle = Substance.Chronicle;
 
 var test = {};
+
 var SCHEMA = {
   "views": {
     // Stores order for content nodes
@@ -170,7 +172,7 @@ var OP9 = ["update", "content", "nodes", ot.ArrayOperation.Insert(1, "text2") ];
 //
 
 test.setup = function() {
-  this.graph = new Substance.Data.VersionedGraph(SCHEMA);
+  this.graph = new Substance.Data.Graph(SCHEMA, {chronicle: Chronicle.create()});
   this.chronicle = this.graph.chronicle;
   this.index = this.chronicle.index;
   this.adapter = this.graph.chronicle.versioned;
