@@ -484,6 +484,20 @@ test.actions = [
     var path = ["c1", "items"];
     this.graph.delete(path, "i2");
     assert.isArrayEqual(["i1", "i3"], this.graph.get(path));
+    this.graph.exec(["delete"].concat(path).concat("i3"));
+    assert.isArrayEqual(["i1"], this.graph.get(path));
+  },
+
+  "Data.Array.Push: ", function() {
+    var path = ["c1", "items"];
+    this.graph.exec(["push", "c1", "items", "i2"]);
+    assert.isArrayEqual(["i1", "i2"], this.graph.get(path));
+  },
+
+  "Data.Array.Pop: ", function() {
+    var path = ["c1", "items"];
+    this.graph.exec(["pop", "c1", "items"]);
+    assert.isArrayEqual(["i1"], this.graph.get(path));
   }
 
 ];
