@@ -61,8 +61,8 @@ var ChronicleTest = function() {
   this.setup = function() {
     Chronicle.HYSTERICAL = true;
     ID_IDX = 1;
-    this.index = Chronicle.Index.create();
-    this.chronicle = Chronicle.create(this.index);
+    this.chronicle = Chronicle.create();
+    this.index = this.chronicle.index;
     this.comp = new testchronicle.VersionedComputador(this.chronicle);
     this.chronicle.uuid = this.uuid;
 

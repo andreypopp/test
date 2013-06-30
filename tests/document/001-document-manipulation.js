@@ -9,13 +9,14 @@ var Document = root.Substance.Document;
 var test = {};
 
 test.setup = function() {
-  this.doc = new Document({"id": "substance-doc"});
+  this.doc = new Document({
+    id: "substance-doc",
+    creator: "michael",
+    created_at: new Date()
+  });
 };
 
 test.actions = [
-  "Initialization", function() {
-
-  },
 
   "Check if valid document has been constructed", function() {
     assert.isArrayEqual(["content", "figures", "publications"], this.doc.get('document').views);

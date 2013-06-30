@@ -5,15 +5,15 @@ var assert = root.Substance.assert;
 
 var Chronicle = root.Substance.Chronicle;
 var Change = Chronicle.Change;
-var PersistentIndex = Chronicle.PersistentIndex;
 
 function PersistentIndexTest(impl) {
 
   this.setup = function() {
     impl.setup();
     this.store = impl.store;
-    this.index = new PersistentIndex(this.store);
 
+    this.chronicle = Chronicle.create({store: this.store});
+    this.index = this.chronicle.index;
     this.changes = this.index.__changes__;
     this.refs = this.index.__refs__;
   };
@@ -55,7 +55,7 @@ function PersistentIndexTest(impl) {
     },
 
     "Import from store", function() {
-      var index2 = new PersistentIndex(this.store);
+      var index2 = Chronicle.Index.create({store: this.store});
 
       assert.isArrayEqual(["1","2","3","4","ROOT"], index2.list().sort())
       assert.isArrayEqual(["/remote/origin/master", "master:HEAD", "master:LAST", "other"], index2.listRefs().sort())
