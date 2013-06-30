@@ -4,21 +4,11 @@ var Substance = root.Substance;
 var assert = root.Substance.assert;
 var _ = root._;
 var ELIFE_DOCUMENT = root.ELIFE_DOCUMENT;
+var Data = root.Substance.Data;
 
 var test = {};
 
 var SCHEMA = {
-
-  // Views for storing order
-  // ------------------
-
-  "views": {
-    // Stores order for content nodes
-    "content": {},
-    "figures": {},
-    "publications": {},
-    "info": {}
-  },
 
   // Dynamic Indexes
   // ------------------
@@ -44,6 +34,10 @@ var SCHEMA = {
     },
 
     // Annotations indexed by target
+    // TODO: Rethink. Now, our Schema is very strict, so that the former approach indexing
+    // annotations with `target` properties does not work anymore, as annotations do not have such a property
+    // For now I introduced a 'reference' which does have this.
+    // Maybe we want to relax the strictness and support duck-typing...
     "reverse_annotations": {
       "type": "annotation",
       "properties": ["target"]
@@ -67,6 +61,22 @@ var SCHEMA = {
 
     "content": {
       "properties": {}
+    },
+
+    "document": {
+      "properties": {
+        "views": ["array", "view"],
+        "id": "string",
+        "creator": "string",
+        "title": "string",
+        "abstract": "string"
+      }
+    },
+
+    "view": {
+      "properties": {
+        "nodes": ["array", "content"]
+      }
     },
 
     // Abstract type shared by all figure types (images, videos, tables, supplments)
@@ -279,9 +289,43 @@ var SCHEMA = {
   }
 };
 
+var SEED = function(options) {
+  return [
+    Data.Graph.Create({
+      id: "document",
+      type: "document",
+      creator: options.creator,
+      created_at: options.created_at,
+      views: ["content", "figures", "publications"],
+      title: "",
+      abstract: ""
+    }),
+    Data.Graph.Set(["document", "id"], options.id),
+    Data.Graph.Create({
+      id: "content",
+      type: "view",
+      nodes: [],
+    }),
+    Data.Graph.Create({
+      id: "figures",
+      type: "view",
+      nodes: [],
+    }),
+    Data.Graph.Create({
+      id: "publications",
+      type: "view",
+      nodes: [],
+    })
+  ];
+};
 
 function convert(eLifeDoc) {
-  var doc = new Substance.Document({id: "new-doc"}, SCHEMA);
+  var data = {
+    id: "custom-doc",
+    creator: "michael",
+    created_at: new Date()
+  };
+  var doc = new Substance.Document({schema: SCHEMA, seed: SEED(data)});
 
   function insert(nodeId, view) {
     if (doc.nodes[nodeId]) return; // skip existing nodes
@@ -292,7 +336,7 @@ function convert(eLifeDoc) {
     delete data.type;
 
     var op = [
-      "insert",
+      "create",
       {
         "id": node.id,
         "type": node.type,
@@ -300,7 +344,7 @@ function convert(eLifeDoc) {
         "data": data
       }
     ];
-    doc.apply(op);
+    doc.exec(op);
   }
 
   _.each(eLifeDoc.views.text.nodes, function(nodeId) {
@@ -336,7 +380,7 @@ function convert(eLifeDoc) {
     if (type === "figure") type = "figure_reference";
 
     var op = [
-      "insert",
+      "create",
       {
         "id": node.id,
         "type": type,
@@ -349,7 +393,7 @@ function convert(eLifeDoc) {
       }
     ];
 
-    doc.apply(op);
+    doc.exec(op);
   });
 
   return doc;
