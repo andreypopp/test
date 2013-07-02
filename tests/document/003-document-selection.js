@@ -33,31 +33,25 @@ test.actions = [
 
   "Select text in a single text node", function() {
 
-    var selection = new Document.Range({
-      "start": [0, 4],
-      "end": [0, 9]
-    });
+    var selection = this.doc.select({start: [0, 4], end: [0, 9]});
 
-    this.doc.select(selection);
     // assert.isEqual(selection, this.doc.selection);
-    assert.isEqual(1, selection.getNodes(this.doc).length);
-    assert.isEqual("quick", selection.getText(this.doc));
+    assert.isEqual(1, selection.getNodes().length);
+    assert.isEqual("quick", selection.getText());
   },
 
   "Break node into pieces", function() {
-    var selection = {
-      "start": [0,4],
-      "end": [0,4]
-    };
 
-    this.doc.select(selection);
+    var selection = this.doc.select({start: [0, 4], end: [0, 4]});
     this.doc.insertNode("text");
 
     // Original node
-    var contentView = this.get('content').nodes;
-    var t1 = this.get(contentView[0]);
-    var t2 = this.get(contentView[1]);
-    var t3 = this.get(contentView[2]);
+    var contentView = this.doc.get('content').nodes;
+    assert.isEqual(3, contentView.length);
+
+    var t1 = this.doc.get(contentView[0]);
+    var t2 = this.doc.get(contentView[1]);
+    var t3 = this.doc.get(contentView[2]);
 
     // New node
     assert.isEqual("The ", t1.content);
@@ -68,7 +62,6 @@ test.actions = [
     assert.isEqual("text", t3.type);
 
     assert.isEqual("", selection.getText());
-
   },
 
 
