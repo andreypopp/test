@@ -336,9 +336,8 @@ ArrayOperationTest.__prototype__ = function() {
   };
 
   this.setup = function() {
-    Chronicle.HYSTERICAL = true;
-    this.index = Chronicle.Index.create();
-    this.chronicle = Chronicle.create(this.index);
+    this.chronicle = Chronicle.create({mode: Chronicle.HYSTERICAL});
+    this.index = this.chronicle.index;
 
     ID_IDX = 1;
     this.chronicle.uuid = this.uuid;
