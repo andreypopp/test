@@ -476,7 +476,7 @@ test.actions = [
 
     path = ["t1", "items"];
     nodes = this.graph.query(path);
-    var ids = [getIds(nodes[0]), getIds(nodes[1])];
+    ids = [getIds(nodes[0]), getIds(nodes[1])];
     assert.isObjectEqual([["i1", "i3"], ["i2", "i3"]], ids);
   },
 
@@ -498,7 +498,85 @@ test.actions = [
     var path = ["c1", "items"];
     this.graph.exec(["pop", "c1", "items"]);
     assert.isArrayEqual(["i1"], this.graph.get(path));
-  }
+  },
+
+  "Load fixture 3", function() {
+    this.fixture3();
+  },
+
+  "Property Change Listener: filter by path", function() {
+    var called = 0;
+    var listener = function() {
+      called++;
+    };
+
+    this.graph.propertyChanges().bind(listener, {path: ["the_strings", "val"]});
+    this.graph.update(["the_strings", "val"], ot.TextOperation.Insert(0, "bla"));
+    this.graph.update(["the_strings", "arr"], ot.ArrayOperation.Insert(0, "bla"));
+
+    assert.isEqual(1, called);
+    this.graph.propertyChanges().unbind(listener);
+  },
+
+  "Property Change Listener: filter by operation type", function() {
+    var called = 0;
+    var listener = function() {
+      called++;
+    };
+
+    this.graph.propertyChanges().bind(listener, {type: "set"});
+    this.graph.set(["the_strings", "val"], "bla");
+    this.graph.update(["the_strings", "arr"], ot.ArrayOperation.Insert(0, "bla"));
+
+    assert.isEqual(1, called);
+
+    this.graph.propertyChanges().unbind(listener);
+  },
+
+  "Property Change Listener: filter by operation type and path", function() {
+    var called = 0;
+    var listener = function() {
+      called++;
+    };
+
+    this.graph.propertyChanges().bind(listener, {type: "set", path: ["the_strings", "val"]});
+    this.graph.set(["the_strings", "val"], "bla");
+    this.graph.set(["the_numbers", "val"], 1);
+
+    assert.isEqual(1, called);
+
+    this.graph.propertyChanges().unbind(listener);
+  },
+
+  "Property Change Listener: compounds", function() {
+    var called_set = 0;
+    var called_update = 0;
+    var set_listener = function() {
+      called_set++;
+    };
+    var update_listener = function() {
+      called_update++;
+    };
+
+    this.graph.propertyChanges().bind(set_listener, {type: "set", path: ["the_strings", "val"]});
+    this.graph.propertyChanges().bind(update_listener, {type: "update", path: ["the_strings", "val"]});
+
+    var ops = [
+      Data.Graph.Set(["the_strings", "val"], "bla"),
+      Data.Graph.Update(["the_strings", "val"], ot.TextOperation.Insert(0, "bla")),
+    ]
+    this.graph.exec(Data.Graph.Compound(this.graph, ops));
+
+    assert.isEqual(1, called_set);
+    assert.isEqual(1, called_update);
+
+    this.graph.propertyChanges().unbind(set_listener);
+    this.graph.propertyChanges().unbind(update_listener);
+  },
+
+  /*
+    TODO: add a test to cover usage of listener function vs operation adapter
+  */
 
 ];
 
