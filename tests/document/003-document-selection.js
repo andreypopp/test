@@ -33,13 +33,19 @@ test.actions = [
 
   "Select text in a single text node", function() {
     var selection = this.doc.select({start: [0, 4], end: [0, 9]});
-    // assert.isEqual(selection, this.doc.selection);
     assert.isEqual(1, selection.getNodes().length);
     assert.isEqual("quick", selection.getText());
   },
 
   "Select text spanning over multiple text nodes", function() {
     var selection = this.doc.select({start: [0, 4], end: [1, 11]});
+
+    // alternative selection api to be discussed
+    // this.select({
+    //   start: {"node": "t1", "offset": 4},
+    //   end: {"node": "t2", "offset": 11}
+    // });
+
     // assert.isEqual(selection, this.doc.selection);
     assert.isEqual(2, selection.getNodes().length);
     assert.isEqual("quick brown fox jumps over the lazy dog.Lorem ipsum", selection.getText());
@@ -66,7 +72,6 @@ test.actions = [
     assert.isEqual("text", t1b.type);
 
     assert.isEqual("", selection.getText());
-
   },
 
   "Type some new text into new node", function() {
@@ -79,25 +84,27 @@ test.actions = [
     // Pull out the fresh node to be updated
     this.freshNode = this.doc.selection.getNodes()[0];
   
-    console.log('node', this.freshNode);
     var op = [
-      "update", this.freshNode.id, "content", ["Hello World!"]
+      "update", this.freshNode.id, "content", ["Hello Worrrrld!"]
     ];
 
     this.doc.exec(op);
+    assert.isEqual("Hello Worrrrld!", this.freshNode.content);
+  },
+
+  "Delete selection", function() {
+    this.doc.select({start: [1, 9], end: [1, 12]});
+    this.doc.delete();
     assert.isEqual("Hello World!", this.freshNode.content);
   },
 
-
-  "Cut selection spanning over multiple text nodes", function() {
-    // var nodes = this.doc.query(['content', 'nodes']);
-    // console.log(nodes);
-    
+  "Copy selection and store in clipboard", function() {
     // Current state
-    // t1a: "The "
+    // t1a:  "The "
     // tnew: "Hello World!"
-    // t1b: "quick brown fox jumps over the lazy dog."
-    // t2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    // t1b:  "quick brown fox jumps over the lazy dog."
+    // t2:   "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+
     this.doc.select({start: [0, 3], end: [2, 11]});
 
     assert.isEqual(3, this.doc.selection.getNodes().length);
@@ -105,8 +112,24 @@ test.actions = [
     // Check selection
     assert.isEqual(" Hello World!quick brown", this.doc.selection.getText());
 
-    // Stores the cutted document in this.doc.clipboard
-    this.doc.cutSelection();
+    // Stores the cutted document in this.session.clipboard
+    this.doc.copy();
+
+    // Expected clipboard contents
+    // t1: " "
+    // t2: "Hello World!"
+    // t3: "quick brown"
+
+    var clipboardContent = this.session.clipboard.get('content').nodes;
+    assert.isEqual(3, clipboardContent.length);
+
+    assert.isEqual(" ", this.session.clipboard.get(clipboardContent[0]).content);
+    assert.isEqual("Hello World!", this.session.clipboard.get(clipboardContent[1]).content);
+    assert.isEqual("quick brown", this.session.clipboard.get(clipboardContent[2]).content);
+  },
+
+  "Delete the copied stuff", function() {
+    this.doc.delete();
 
     // Desired new contents
     // t1a: "The"
@@ -114,76 +137,35 @@ test.actions = [
     // t2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
     var contentView = this.doc.get('content').nodes;
-    // assert.isEqual(3, contentView.length);
+    assert.isEqual(3, contentView.length);
 
-    var t1a = this.doc.get(contentView[0]);
-    assert.isEqual("The ", this.doc.get(contentView[0]).content);
+    assert.isEqual("The", this.doc.get(contentView[0]).content);
+    assert.isEqual(" fox jumps over the lazy dog.", this.doc.get(contentView[1]).content);
+    assert.isEqual("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", this.doc.get(contentView[2]).content);
+  },
 
-    return;
-    // assert.isEqual(" fox jumps over the lazy dog.", this.doc.get(contentView[1]).content);
-    // assert.isEqual("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", this.doc.get(contentView[2]).content);
+  "Paste clipboard into document", function() {
+    this.doc.select({start: [2,12], end: [2,17]});
 
-    // assert.isEqual("The fox jumps over the lazy dog.Lorem ipsum dolor sit amet, consectetur adipiscing elit.", this.doc);
-
-    // Clipboard
-    // t1: " "
-    // t2: "Hello World!"
-    // t3: "quick brown"
-
-    var clipboardContent = this.doc.clipboard.get('content').nodes;
-    assert.isEqual(3, clipboardContent.length);
-
-    var t1a = this.doc.get(clipboardContent[0]);
-    assert.isEqual(" ", this.doc.get(clipboardContent[0]).content);
-    assert.isEqual("Hello World", this.doc.get(clipboardContent[1]).content);
-    assert.isEqual("quick brown", this.doc.get(clipboardContent[2]).content);
-
-    // make a new selection (place selction over "Lorem ipsum")
-    // which will be replaced by the clipboard's contents
-    this.doc.select({start: [2,0], end: [2,10]});
-    
-    this.doc.pasteClipboard();
+    this.doc.paste();
 
     // Desired new contents
     // t1a:   "The"
     // t1b:   " fox jumps over the lazy dog."
-    // t2:    "Lorem ipsum "
+    // t2:    "Lorem ipsum  "  -> one space more from first node in clipboard
     // tnew:  "Hello World!"
-    // tnew2: "quick browndolor sit amet, consectetur adipiscing elit."
+    // tnew2: "quick brown sit amet, consectetur adipiscing elit."
 
+    var contentView = this.doc.get('content').nodes;
+    assert.isEqual(5, contentView.length);
 
-    console.log('nodes', selection.getText());
+    assert.isEqual("The", this.doc.get(contentView[0]).content);
+    assert.isEqual(" fox jumps over the lazy dog.", this.doc.get(contentView[1]).content);
+    assert.isEqual("Lorem ipsum  ", this.doc.get(contentView[2]).content);
 
-    // var selection = this.doc.select({start: [0, 4], end: [1, 11]});
-    // // assert.isEqual(selection, this.doc.selection);
-    // assert.isEqual(2, selection.getNodes().length);
-    // assert.isEqual("quick brown fox jumps over the lazy dog.Lorem ipsum", selection.getText());
-  },
-
-
-  // "Check if valid document has been constructed", function() {
-  //   assert.isArrayEqual(["content", "figures", "publications"], this.doc.get('document').views);
-  //   assert.isTrue(_.isArray(this.doc.get('content').nodes));
-  // },
-
-  // "Create a new heading node", function() {
-  //   var op = ["create", {
-  //       "id": "h1",
-  //       "type": "heading",
-  //       "content": "Heading 1"
-  //     }
-  //   ];
-
-  //   this.doc.exec(op);
-  //   assert.isEqual(op[1].content, this.doc.get('h1').content);
-
-  //   // h1.level should be automatically initialized with 0
-  //   // TODO: should default to null later, once we support null values
-  //   assert.isEqual(0, this.doc.get('h1').level);
-  // },
-
-
-
+    assert.isEqual("Hello World!", this.doc.get(contentView[3]).content);
+    assert.isEqual("quick brown sit amet, consectetur adipiscing elit.", this.doc.get(contentView[4]).content);
+  }
 ];
 
 root.Substance.registerTest(['Document', 'Document Selection'], test);
