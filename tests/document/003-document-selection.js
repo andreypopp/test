@@ -113,19 +113,19 @@ test.actions = [
     assert.isEqual(" Hello World!quick brown", this.doc.selection.getText());
 
     // Stores the cutted document in this.session.clipboard
-    this.doc.copy();
+    this.clipboard = this.doc.copy();
 
     // Expected clipboard contents
     // t1: " "
     // t2: "Hello World!"
     // t3: "quick brown"
 
-    var clipboardContent = this.session.clipboard.get('content').nodes;
+    var clipboardContent = this.clipboard.get('content').nodes;
     assert.isEqual(3, clipboardContent.length);
 
-    assert.isEqual(" ", this.session.clipboard.get(clipboardContent[0]).content);
-    assert.isEqual("Hello World!", this.session.clipboard.get(clipboardContent[1]).content);
-    assert.isEqual("quick brown", this.session.clipboard.get(clipboardContent[2]).content);
+    assert.isEqual(" ", this.clipboard.get(clipboardContent[0]).content);
+    assert.isEqual("Hello World!", this.clipboard.get(clipboardContent[1]).content);
+    assert.isEqual("quick brown", this.clipboard.get(clipboardContent[2]).content);
   },
 
   "Delete the copied stuff", function() {
@@ -147,7 +147,7 @@ test.actions = [
   "Paste clipboard into document", function() {
     this.doc.select({start: [2,12], end: [2,17]});
 
-    this.doc.paste();
+    this.doc.paste(this.clipboard);
 
     // Desired new contents
     // t1a:   "The"
